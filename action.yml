@@ -1,0 +1,105 @@
+name: 'Typst Out'
+description: 'Build Typst files using a custom Typst ref'
+branding:
+  icon: 'file-text'
+  color: 'blue'
+inputs:
+  typst_ref:
+    description: 'The ref of Typst to use for building'
+    required: false
+    default: 'main'
+  retention_days:
+    description: 'The number of days to retain the PDFs as artifacts'
+    required: false
+    default: '7'
+  artifacts_name:
+    description: 'The name of the artifacts to upload'
+    required: false
+    default: 'typst_output'
+  output_extensions:
+    description: 'The extensions of the output files'
+    required: false
+    default: 'pdf'
+  template_file:
+    description: 'The template file to use'
+    required: false
+    default: 'template.typ'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Echo Typst ref
+      shell: bash
+      run: |
+        echo "Typst ref: ${{ inputs.typst_ref }}" 
+
+    - name: Get Typst commit SHA from ref
+      id: typst_commit_sha
+      shell: bash
+      run: |
+        echo "sha=$(git ls-remote https://github.com/typst/typst.git ${{ inputs.typst_ref }} | cut -f1)" >> $GITHUB_OUTPUT
+
+    - name: Cache Typst build
+      uses: actions/cache@v3
+      id: typst_cache
+      with:
+        path: ~/typst_build
+        key: typst-${{ steps.typst_commit_sha.outputs.sha }}
+
+    - name: Setup Rust
+      if: steps.typst_cache.outputs.cache-hit != 'true'
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Cache Rust
+      if: steps.typst_cache.outputs.cache-hit != 'true'
+      uses: Swatinem/rust-cache@v2
+
+    # Use input typst_ref to checkout a specific ref of Typst
+    - name: Checkout Typst
+      if: steps.typst_cache.outputs.cache-hit != 'true'
+      uses: actions/checkout@v3
+      with:
+        repository: typst/typst
+        path: typst
+        ref: ${{ inputs.typst_ref }}
+
+    - name: Install Typst
+      if: steps.typst_cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        cd typst
+        cargo build -p typst-cli --release
+        cd ..
+        if [ -f typst/target/release/typst ]; then
+          mkdir -p ~/typst_build
+          cp typst/target/release/typst ~/typst_build/typst
+          rm -rf typst
+          echo "Typst build succeeded"
+        else
+          echo "Typst build failed"
+          exit 1
+        fi
+
+    - name: Compile Typst files
+      shell: bash
+      run: |
+        templatefile="${{ inputs.template_file }}"
+        outputextension="${{ inputs.output_extensions }}"
+        echo "Compiling Typst files"
+        echo "Template file: $templatefile"
+        echo "Output extension: $outputextension"
+        find . -name "*.typ" -not -name "template.typ" | while read -r file; do
+          echo "Compiling $file to ${file%.typ}.${outputextension}"
+          ~/typst_build/typst "$file" "${file%.typ}.${outputextension}"
+        done
+        echo "Compiled Typst files"
+        echo "Output files:"
+        find . -name "*.$outputextension"
+
+    - name: Upload ouputs as artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ inputs.artifacts_name }}
+        path: |
+          ./**/*.pdf
+        retention-days: ${{ inputs.retention_days }}
