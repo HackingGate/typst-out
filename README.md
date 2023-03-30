@@ -55,7 +55,7 @@ In this GitHub action, caching is used to store and retrieve the build artifacts
 
 There are two caching steps in this action:
 
-1. Cache Typst build: This step caches the built Typst binary using the actions/cache@v3 action. The cache key is created using the Typst commit SHA from the specified typst_ref. When the action is run, it checks if there's a cache hit (i.e., if a cached Typst binary exists for the given commit SHA). If there's a cache hit, the action skips the subsequent steps for setting up Rust and building Typst, and directly proceeds to the step for compiling Typst files.
+1. **Cache Typst build**: This step caches the built Typst binary using the `actions/cache@v3` action. The cache key is created using the Typst commit SHA from the specified `typst_ref`. When the action is run, it checks if there's a cache hit (i.e., if a cached Typst binary exists for the given commit SHA). If there's a cache hit, the action skips the subsequent steps for setting up Rust and building Typst, and directly proceeds to the step for compiling Typst files.
 
 ```yaml
 - name: Cache Typst build
@@ -66,7 +66,7 @@ There are two caching steps in this action:
     key: typst-${{ steps.typst_commit_sha.outputs.sha }}
 ```
 
-2. Cache Rust: If there's no cache hit for the Typst build, this step caches the Rust dependencies using the Swatinem/rust-cache@v2 action. By caching the Rust dependencies, the action can significantly reduce the time taken to set up Rust and compile the Typst binary in future runs.
+2. **Cache Rust**: If there's no cache hit for the Typst build, this step caches the Rust dependencies using the `Swatinem/rust-cache@v2` action. By caching the Rust dependencies, the action can significantly reduce the time taken to set up Rust and compile the Typst binary in future runs.
 
 ```yaml
 - name: Cache Rust
