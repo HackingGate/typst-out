@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Build Typst files
-        uses: HackingGate/typst_out@v1
+        uses: HackingGate/typst-out@v1
         with:
           typst_ref: main
           retention_days: 7
