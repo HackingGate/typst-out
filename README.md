@@ -1,7 +1,8 @@
 # Typst Out GitHub Action
 This GitHub action automatically builds Typst files in your repository using a custom Typst ref and uploads the output files as artifacts.
 
-[![Test Action](https://github.com/HackingGate/typst-out/actions/workflows/test.yml/badge.svg)](https://github.com/HackingGate/typst-out/actions/workflows/test.yml)
+[![Test Latest Release Action](https://github.com/HackingGate/typst-out/actions/workflows/test_latest_release.yml/badge.svg)](https://github.com/HackingGate/typst-out/actions/workflows/test_latest_release.yml)
+[![Test Main Branch Action](https://github.com/HackingGate/typst-out/actions/workflows/test_main_branch.yml/badge.svg)](https://github.com/HackingGate/typst-out/actions/workflows/test_main_branch.yml)
 
 ## Features
 
@@ -38,6 +39,24 @@ jobs:
           template_file: template.typ
 ```
 
+To use the latest release of Typst, you can use the `pozetroninc/github-action-get-latest-release` action to get the latest release from `Typst/Typst`.
+
+```yaml
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Get latest release of Typst
+      id: get-latest-release
+      uses: pozetroninc/github-action-get-latest-release@master
+      with:
+        repository: typst/typst
+
+    - name: Build Typst files
+      uses: HackingGate/typst-out@main
+      with:
+        typst_ref: ${{ steps.get-latest-release.outputs.release }}
+```
 
 ## Inputs
 
