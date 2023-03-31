@@ -1,7 +1,8 @@
 # Typst Out GitHub Action
 This GitHub action automatically builds Typst files in your repository using a custom Typst ref and uploads the output files as artifacts.
 
-[![Test Action](https://github.com/HackingGate/typst-out/actions/workflows/test.yml/badge.svg)](https://github.com/HackingGate/typst-out/actions/workflows/test.yml)
+[![Test Latest Release Action](https://github.com/HackingGate/typst-out/actions/workflows/test_latest_release.yml/badge.svg)](https://github.com/HackingGate/typst-out/actions/workflows/test_latest_release.yml)
+[![Test Main Branch Action](https://github.com/HackingGate/typst-out/actions/workflows/test_main_branch.yml/badge.svg)](https://github.com/HackingGate/typst-out/actions/workflows/test_main_branch.yml)
 
 ## Features
 
