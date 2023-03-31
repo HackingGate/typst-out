@@ -39,6 +39,24 @@ jobs:
           template_file: template.typ
 ```
 
+To use the latest release of Typst, you can use the `pozetroninc/github-action-get-latest-release` action to get the latest release from `Typst/Typst`.
+
+```yaml
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Get latest release of Typst
+      id: get-latest-release
+      uses: pozetroninc/github-action-get-latest-release@master
+      with:
+        repository: typst/typst
+
+    - name: Build Typst files
+      uses: HackingGate/typst-out@main
+      with:
+        typst_ref: ${{ steps.get-latest-release.outputs.release }}
+```
 
 ## Inputs
 
