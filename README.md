@@ -39,7 +39,7 @@ jobs:
           template_file: template.typ
 ```
 
-To use the latest release of Typst, you can use the `pozetroninc/github-action-get-latest-release` action to get the latest release from `Typst/Typst`.
+To use the latest release of Typst, you can use the `pozetroninc/github-action-get-latest-release` action to get the latest release from `typst/typst`.
 
 ```yaml
     steps:
