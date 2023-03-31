@@ -15,7 +15,7 @@ This GitHub action automatically builds Typst files in your repository using a c
 
 To use the Typst Out action in your GitHub repository, create a new workflow file (e.g., `.github/workflows/typst_out.yml`) and add the following content:
 
-```ymal
+```yaml
 on:
   push:
     paths:
