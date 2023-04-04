@@ -120,20 +120,22 @@ runs:
         if [ "$use_typst_fonts" = "true" ]; then
           echo "Using Typst fonts"
           fonts_path="~/typst_fonts"
-        elif [ "use_typst_fonts" = "false" ]; then
-          echo "Not using Typst fonts"
-          if [ fonts_path = "" ]; then
-            echo "No fonts path provided"
-          else
-            echo "Using fonts path: $fonts_path"
-          fi
         fi
+        echo "Fonts path: $fonts_path"
         find . -name "*.typ" -not -name "template.typ" | while read -r file; do
           echo "Compiling $file to ${file%.typ}.${outputextension}"
           if ~/typst_build/typst --help | grep -q " compile "; then
-            ~/typst_build/typst --font-path "$fonts_path" compile "$file" "${file%.typ}.${outputextension}"
+            if [ "$fonts_path" = "" ]; then
+              ~/typst_build/typst compile "$file" "${file%.typ}.${outputextension}"
+            else
+              ~/typst_build/typst --font-path "$fonts_path" compile "$file" "${file%.typ}.${outputextension}"
+            fi
           else
-            ~/typst_build/typst --font-path "$fonts_path" "$file" "${file%.typ}.${outputextension}"
+            if [ "$fonts_path" = "" ]; then
+              ~/typst_build/typst "$file" "${file%.typ}.${outputextension}"
+            else
+              ~/typst_build/typst --font-path "$fonts_path" "$file" "${file%.typ}.${outputextension}"
+            fi
           fi
         done
         echo "Compiled Typst files"
