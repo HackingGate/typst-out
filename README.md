@@ -85,21 +85,20 @@ There are three caching steps in this action:
     key: typst-${{ steps.typst_commit_sha.outputs.sha }}
 ```
 
-2. **Cache Rust**: If there's no cache hit for the Typst build, this step caches the Rust dependencies using the `Swatinem/rust-cache@v2` action. By caching the Rust dependencies, the action can significantly reduce the time taken to set up Rust and compile the Typst binary in future runs.
+2. **Cache Typst font**: This step caches the fonts in the `typst/assets/fonts` directory using the `actions/cache@v3` action. The cache key is created using the Typst commit SHA from the specified `typst_ref`. When the action is run, it checks if there's a cache hit (i.e., if a cached set of fonts exists for the given commit SHA). If there's a cache hit, the action skips the subsequent step for fetching the fonts and proceeds to the next steps in the workflow. Caching the fonts helps reduce the time taken to install fonts in future runs.
+
+```yaml
+- name: Cache Typst fonts
+  uses: actions/cache@v3
+  with:
+    path: ~/typst_fonts
+    key: fonts-${{ steps.typst_commit_sha.outputs.sha }}
+```
+
+3. **Cache Rust**: If there's no cache hit for the Typst build, this step caches the Rust dependencies using the `Swatinem/rust-cache@v2` action. By caching the Rust dependencies, the action can significantly reduce the time taken to set up Rust and compile the Typst binary in future runs.
 
 ```yaml
 - name: Cache Rust
   if: steps.typst_cache.outputs.cache-hit != 'true'
   uses: Swatinem/rust-cache@v2
-```
-
-3. **Cache Font**: This step caches the fonts in the `typst/assets/fonts` directory using the `actions/cache@v3` action. The cache key is created using the Typst commit SHA from the specified `typst_ref`. When the action is run, it checks if there's a cache hit (i.e., if a cached set of fonts exists for the given commit SHA). If there's a cache hit, the action skips the subsequent step for installing the fonts and proceeds to the next steps in the workflow. Caching the fonts helps reduce the time taken to install fonts in future runs.
-
-```yaml
-- name: Cache fonts
-  if: steps.typst_cache.outputs.cache-hit != 'true'
-  uses: actions/cache@v3
-  with:
-    path: typst/assets/fonts
-    key: fonts-${{ steps.typst_commit_sha.outputs.sha }}
 ```

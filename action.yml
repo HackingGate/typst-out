@@ -41,28 +41,29 @@ runs:
 
     - name: Cache Typst build
       uses: actions/cache@v3
-      id: typst_cache
+      id: typst_cache_build
       with:
         path: ~/typst_build
         key: typst-${{ steps.typst_commit_sha.outputs.sha }}
 
     - name: Cache Typst fonts
       uses: actions/cache@v3
+      id: typst_cache_fonts
       with:
         path: ~/typst_fonts
         key: fonts-${{ steps.typst_commit_sha.outputs.sha }}
 
     - name: Setup Rust
-      if: steps.typst_cache.outputs.cache-hit != 'true'
+      if: steps.typst_cache_build.outputs.cache-hit != 'true'
       uses: dtolnay/rust-toolchain@stable
 
     - name: Cache Rust
-      if: steps.typst_cache.outputs.cache-hit != 'true'
+      if: steps.typst_cache_build.outputs.cache-hit != 'true'
       uses: Swatinem/rust-cache@v2
 
     # Use input typst_ref to checkout a specific ref of Typst
     - name: Checkout Typst
-      if: steps.typst_cache.outputs.cache-hit != 'true' || steps.cache_fonts.outputs.cache-hit != 'true'
+      if: steps.typst_cache_build.outputs.cache-hit != 'true' || steps.typst_cache_fonts.outputs.cache-hit != 'true'
       uses: actions/checkout@v3
       with:
         repository: typst/typst
@@ -70,7 +71,7 @@ runs:
         ref: ${{ inputs.typst_ref }}
 
     - name: Install Typst
-      if: steps.typst_cache.outputs.cache-hit != 'true' || steps.cache_fonts.outputs.cache-hit != 'true'
+      if: steps.typst_cache_build.outputs.cache-hit != 'true'
       shell: bash
       run: |
         cd typst
@@ -79,14 +80,24 @@ runs:
         if [ -f typst/target/release/typst ]; then
           mkdir -p ~/typst_build
           cp typst/target/release/typst ~/typst_build/typst
-          mkdir -p ~/typst_fonts
-          cp typst/assets/fonts/* ~/typst_fonts
-          rm -rf typst
           echo "Typst build succeeded"
         else
           echo "Typst build failed"
           exit 1
         fi
+
+    - name: Install Typst fonts
+      if: steps.typst_cache_fonts.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        mkdir -p ~/typst_fonts
+        cp typst/assets/fonts/* ~/typst_fonts
+
+    - name: Delete Typst
+      if: steps.typst_cache_build.outputs.cache-hit != 'true' || steps.typst_cache_fonts.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        rm -rf typst
 
     - name: Compile Typst files
       shell: bash
@@ -98,7 +109,7 @@ runs:
         echo "Output extension: $outputextension"
         find . -name "*.typ" -not -name "template.typ" | while read -r file; do
           echo "Compiling $file to ${file%.typ}.${outputextension}"
-          ~/typst_build/typst "$file" "${file%.typ}.${outputextension}"
+          ~/typst_build/typst --font-path ~/typst_fonts "$file" "${file%.typ}.${outputextension}"
         done
         echo "Compiled Typst files"
         echo "Output files:"
