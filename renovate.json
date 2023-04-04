@@ -7,6 +7,7 @@
     "enabled": true
   },
   "automerge": true,
+  "timezone": "Asia/Tokyo",
   "automergeSchedule": [
     "after 10pm every weekday",
     "before 5am every weekday",
