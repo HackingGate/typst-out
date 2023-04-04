@@ -24,6 +24,16 @@ jobs:
         with:
           submodules: true
 
+      - name: Create cjk.typ for test
+        shell: bash
+        run: |
+          mkdir -p test
+          echo "
+            Chinese: 你好，世界！
+            Japanese: こんにちは、世界！
+            Korean: 안녕하세요, 세상아!
+          " > test/cjk.typ
+
       - name: Test Typst Out Action
         uses: ./
         with:
