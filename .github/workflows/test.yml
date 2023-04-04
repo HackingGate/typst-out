@@ -1,4 +1,4 @@
-name: Test Main Branch Action
+name: Test
 
 on: push
 
@@ -11,7 +11,7 @@ jobs:
           submodules: true
       - uses: ./
         with:
-          typst_ref: main
+          typst_ref: 5b0297464efc131beb7be84fa7a02b9a8670b5dd
           retention_days: 7
           artifacts_name: typst_output
           output_extensions: pdf
