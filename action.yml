@@ -52,14 +52,14 @@ runs:
       id: typst_cache_build
       with:
         path: ~/typst_build
-        key: typst-${{ steps.typst_commit_sha.outputs.sha }}
+        key: typst-build-${{ steps.typst_commit_sha.outputs.sha }}
 
     - name: Cache Typst fonts
       uses: actions/cache@v3
       id: typst_cache_fonts
       with:
         path: ~/typst_fonts
-        key: fonts-${{ steps.typst_commit_sha.outputs.sha }}
+        key: typst-fonts-${{ steps.typst_commit_sha.outputs.sha }}
 
     - name: Setup Rust
       if: steps.typst_cache_build.outputs.cache-hit != 'true'
