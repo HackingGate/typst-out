@@ -52,7 +52,7 @@ runs:
       id: typst_cache_build
       with:
         path: ~/typst_build
-        key: typst-build-${{ steps.typst_commit_sha.outputs.sha }}
+        key: typst-build-${{ steps.typst_commit_sha.outputs.sha }}-os-${{ runner.os }}
 
     - name: Cache Typst fonts
       uses: actions/cache@v3
