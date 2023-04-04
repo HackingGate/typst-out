@@ -17,26 +17,23 @@
         "^\\.github/workflows/test_typst_out_action\\.yml$"
       ],
       "matchStrings": [
-        "matrix:\\s*\\n\\s*typst_ref:\\s*\\n\\s*-\\s*(?<currentValue>[a-f0-9]{40})\\s*# latest main"
+        "- (?<currentValue>.*?) # latest main"
       ],
-      "datasourceTemplate": "github",
-      "versioningTemplate": "digest",
-      "depNameTemplate": "typst/typst"
+      "currentValueTemplate": "main",
+      "depNameTemplate": "typst",
+      "lookupNameTemplate": "https://github.com/typst/typst.git",
+      "datasourceTemplate": "git-refs"
     },
     {
       "fileMatch": [
         "^\\.github/workflows/test_typst_out_action\\.yml$"
       ],
       "matchStrings": [
-        "matrix:\\s*\\n\\s*typst_ref:\\s*\\n(?:\\s*-[^\\n]*\\n)+\\s*-\\s*(?<currentValue>[\\w.-]+)\\s*# latest tag"
+        "- (?<currentValue>.*?) # latest tag"
       ],
       "datasourceTemplate": "github-tags",
-      "versioningTemplate": "semver",
+      "versioningTemplate": "loose",
       "depNameTemplate": "typst/typst"
     }
-  ],
-  "commitMessagePrefix": "chore(deps):",
-  "commitMessageAction": "update",
-  "commitMessageTopic": "{{depName}}",
-  "commitMessageExtra": "{{#if isDigest}}digest{{else}}version{{/if}} to {{#if isDigest}}{{newDigest}}{{else}}{{newVersion}}{{/if}}"
+  ]
 }
