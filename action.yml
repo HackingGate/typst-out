@@ -24,6 +24,14 @@ inputs:
     description: 'The template file to use'
     required: false
     default: 'template.typ'
+  use_typst_fonts:
+    description: 'Whether to use the fonts provided by Typst'
+    required: false
+    default: 'true'
+  fonts_path:
+    description: 'The path to the fonts to use'
+    required: false
+    default: ''
 
 runs:
   using: 'composite'
@@ -107,9 +115,15 @@ runs:
         echo "Compiling Typst files"
         echo "Template file: $templatefile"
         echo "Output extension: $outputextension"
+        fonts_path="${{ inputs.fonts_path }}"
+        use_typst_fonts="${{ inputs.use_typst_fonts }}"
+        if [ "$use_typst_fonts" = "true" ]; then
+          echo "Using Typst fonts"
+          fonts_path="~/typst_fonts"
+        fi
         find . -name "*.typ" -not -name "template.typ" | while read -r file; do
           echo "Compiling $file to ${file%.typ}.${outputextension}"
-          ~/typst_build/typst --font-path ~/typst_fonts "$file" "${file%.typ}.${outputextension}"
+          ~/typst_build/typst --font-path "$fonts_path" compile "$file" "${file%.typ}.${outputextension}"
         done
         echo "Compiled Typst files"
         echo "Output files:"
