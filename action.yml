@@ -46,6 +46,12 @@ runs:
         path: ~/typst_build
         key: typst-${{ steps.typst_commit_sha.outputs.sha }}
 
+    - name: Cache Typst fonts
+      uses: actions/cache@v3
+      with:
+        path: ~/typst_fonts
+        key: fonts-${{ steps.typst_commit_sha.outputs.sha }}
+
     - name: Setup Rust
       if: steps.typst_cache.outputs.cache-hit != 'true'
       uses: dtolnay/rust-toolchain@stable
@@ -63,25 +69,6 @@ runs:
         path: typst
         ref: ${{ inputs.typst_ref }}
 
-    - name: Cache fonts
-      if: steps.typst_cache.outputs.cache-hit != 'true'
-      uses: actions/cache@v3
-      with:
-        path: typst/assets/fonts
-        key: fonts-${{ steps.typst_commit_sha.outputs.sha }}
-
-    - name: Install fonts
-      if: steps.typst_cache.outputs.cache-hit != 'true' || steps.cache_fonts.outputs.cache-hit != 'true'
-      shell: bash
-      run: |
-        # install all fonts in assets/fonts
-        cd typst/assets/fonts
-        for font in *; do
-          echo "Installing $font"
-          sudo cp "$font" /usr/share/fonts/truetype/
-          sudo fc-cache -f -v
-        done
-
     - name: Install Typst
       if: steps.typst_cache.outputs.cache-hit != 'true' || steps.cache_fonts.outputs.cache-hit != 'true'
       shell: bash
@@ -92,6 +79,8 @@ runs:
         if [ -f typst/target/release/typst ]; then
           mkdir -p ~/typst_build
           cp typst/target/release/typst ~/typst_build/typst
+          mkdir -p ~/typst_fonts
+          cp typst/assets/fonts/* ~/typst_fonts
           rm -rf typst
           echo "Typst build succeeded"
         else
