@@ -83,7 +83,7 @@ runs:
         done
 
     - name: Install Typst
-      if: steps.typst_cache.outputs.cache-hit != 'true'
+      if: steps.typst_cache.outputs.cache-hit != 'true' || steps.cache_rust.outputs.cache-hit != 'true'
       shell: bash
       run: |
         cd typst
