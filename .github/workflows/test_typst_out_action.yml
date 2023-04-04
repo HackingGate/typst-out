@@ -29,7 +29,7 @@ jobs:
         with:
           typst_ref: ${{ matrix.typst_ref }}
           retention_days: 7
-          artifacts_name: typst_output
+          artifacts_name: typst_output_${{ matrix.typst_ref }}_${{ matrix.os }}
           output_extensions: pdf
           template_file: template.typ
           use_typst_fonts: true
@@ -37,6 +37,7 @@ jobs:
 
       # This step is optional; it can be used to print the generated PDF file
       - name: Display generated PDF file
+        shell: bash
         run: |
           ls -la
           find . -name "*.pdf"
