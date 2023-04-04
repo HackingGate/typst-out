@@ -123,8 +123,7 @@ runs:
         fi
         find . -name "*.typ" -not -name "template.typ" | while read -r file; do
           echo "Compiling $file to ${file%.typ}.${outputextension}"
-          # Check if compile exist in help file
-          if [[ $(~/typst_build/typst --help) == *"compile"* ]]; then
+          if ~/typst_build/typst --help | grep -q " compile "; then
             ~/typst_build/typst --font-path "$fonts_path" compile "$file" "${file%.typ}.${outputextension}"
           else
             ~/typst_build/typst --font-path "$fonts_path" "$file" "${file%.typ}.${outputextension}"
