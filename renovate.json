@@ -10,5 +10,37 @@
     "after 10pm every weekday",
     "before 5am every weekday",
     "every weekend"
+  ],
+  "regexManagers": [
+    {
+      "fileMatch": [
+        "^\\.github/workflows/test_typst_out_action\\.yml$"
+      ],
+      "matchStrings": [
+        "matrix:\\s*\\n\\s*typst_ref:\\s*\\n\\s*-\\s*(?<currentValue>[a-f0-9]{40})\\s*# latest main"
+      ],
+      "depNameTemplate": "typst/typst-main",
+      "datasourceTemplate": "github",
+      "versioningTemplate": "digest",
+      "updateTypes": ["digest"],
+      "lookupName": "typst/typst",
+      "registryUrls": ["https://api.github.com/repos/typst/typst"],
+      "commitMessageExtra": "to {{newDigest}}"
+    },
+    {
+      "fileMatch": [
+        "^\\.github/workflows/test_typst_out_action\\.yml$"
+      ],
+      "matchStrings": [
+        "matrix:\\s*\\n\\s*typst_ref:\\s*\\n\\s*-(?=.*# main)\\s*\\n\\s*-\\s*(?<currentValue>[\\w.-]+)\\s*# latest tag"
+      ],
+      "depNameTemplate": "typst/typst-tag",
+      "datasourceTemplate": "github-tags",
+      "versioningTemplate": "semver",
+      "updateTypes": ["pin"],
+      "lookupName": "typst/typst",
+      "registryUrls": ["https://api.github.com/repos/typst/typst"],
+      "commitMessageExtra": "to {{newVersion}}"
+    }
   ]
 }

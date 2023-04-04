@@ -1,0 +1,43 @@
+name: Test Typst Out Action
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test_typst_out_action:
+    strategy:
+      matrix:
+        typst_ref:
+          - 2c735294cd5e47f1f1eb6402a3b8c500dccd047b # latest main
+          - v23-03-28 # latest tag
+        os: [ubuntu-latest, macos-latest, windows-latest]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Test Typst Out Action
+        uses: ./
+        with:
+          typst_ref: ${{ matrix.typst_ref }}
+          retention_days: 7
+          artifacts_name: typst_output_${{ matrix.typst_ref }}_${{ matrix.os }}
+          output_extensions: pdf
+          template_file: template.typ
+          use_typst_fonts: true
+          fonts_path: ''
+
+      # This step is optional; it can be used to print the generated PDF file
+      - name: Display generated PDF file
+        shell: bash
+        run: |
+          ls -la
+          find . -name "*.pdf"
