@@ -56,7 +56,7 @@ runs:
 
     # Use input typst_ref to checkout a specific ref of Typst
     - name: Checkout Typst
-      if: steps.typst_cache.outputs.cache-hit != 'true' || steps.cache_rust.outputs.cache-hit != 'true'
+      if: steps.typst_cache.outputs.cache-hit != 'true' || steps.cache_fonts.outputs.cache-hit != 'true'
       uses: actions/checkout@v3
       with:
         repository: typst/typst
@@ -69,7 +69,7 @@ runs:
       with:
         path: typst/assets/fonts
         key: fonts-${{ steps.typst_commit_sha.outputs.sha }}
-    
+
     - name: Install fonts
       if: steps.typst_cache.outputs.cache-hit != 'true' || steps.cache_fonts.outputs.cache-hit != 'true'
       shell: bash
@@ -83,7 +83,7 @@ runs:
         done
 
     - name: Install Typst
-      if: steps.typst_cache.outputs.cache-hit != 'true' || steps.cache_rust.outputs.cache-hit != 'true'
+      if: steps.typst_cache.outputs.cache-hit != 'true' || steps.cache_fonts.outputs.cache-hit != 'true'
       shell: bash
       run: |
         cd typst
