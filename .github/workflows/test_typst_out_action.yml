@@ -16,6 +16,7 @@ jobs:
         typst_ref:
           - f347ed4314e32383dc09ff234180e8ea6fef7b8b # latest main
           - v23-03-28 # latest tag
+      fail-fast: false
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
