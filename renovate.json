@@ -21,7 +21,7 @@
       "matchStrings": [
         "- (?<currentValue>.*?) # latest main"
       ],
-      "depNameTemplate": "typst",
+      "depNameTemplate": "typst/typst/main",
       "lookupNameTemplate": "https://github.com/typst/typst.git",
       "datasourceTemplate": "git-refs",
       "versioningTemplate": "git"
@@ -35,7 +35,7 @@
       ],
       "datasourceTemplate": "github-releases",
       "versioningTemplate": "loose",
-      "depNameTemplate": "typst/typst"
+      "depNameTemplate": "typst/typst/release"
     }
   ]
 }
