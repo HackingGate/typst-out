@@ -41,29 +41,25 @@ runs:
       run: |
         echo "Typst ref: ${{ inputs.typst_ref }}" 
 
-    - name: Get Typst commit SHA from ref
-      id: typst_commit_sha
-      shell: bash
-      run: |
-        echo "sha=$(git ls-remote https://github.com/typst/typst.git ${{ inputs.typst_ref }} | cut -f1)" >> $GITHUB_OUTPUT
-
     - name: Cache Typst build
       uses: actions/cache@v3
       id: typst_cache_build
       with:
         path: ~/typst_build
-        key: typst-build-${{ steps.typst_commit_sha.outputs.sha }}-os-${{ runner.os }}
+        key: typst-build-${{ inputs.typst_ref }}-${{ runner.os }}
 
     - name: Cache Typst fonts
       uses: actions/cache@v3
       id: typst_cache_fonts
       with:
         path: ~/typst_fonts
-        key: typst-fonts-${{ steps.typst_commit_sha.outputs.sha }}
+        key: typst-fonts-${{ inputs.typst_ref }}
 
     - name: Setup Rust
       if: steps.typst_cache_build.outputs.cache-hit != 'true'
-      uses: dtolnay/rust-toolchain@v1
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
 
     - name: Cache Rust
       if: steps.typst_cache_build.outputs.cache-hit != 'true'
