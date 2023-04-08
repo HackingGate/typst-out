@@ -23,7 +23,8 @@
       ],
       "depNameTemplate": "typst",
       "lookupNameTemplate": "https://github.com/typst/typst.git",
-      "datasourceTemplate": "git-refs"
+      "datasourceTemplate": "git-refs",
+      "versioningTemplate": "git"
     },
     {
       "fileMatch": [
