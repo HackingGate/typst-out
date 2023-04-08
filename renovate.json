@@ -21,7 +21,6 @@
       "matchStrings": [
         "- (?<currentValue>.*?) # latest main"
       ],
-      "currentValueTemplate": "main",
       "depNameTemplate": "typst",
       "lookupNameTemplate": "https://github.com/typst/typst.git",
       "datasourceTemplate": "git-refs"
