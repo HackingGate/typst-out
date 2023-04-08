@@ -31,9 +31,9 @@
         "^\\.github/workflows/test_typst_out_action\\.yml$"
       ],
       "matchStrings": [
-        "- (?<currentValue>.*?) # latest tag"
+        "- (?<currentValue>.*?) # latest release"
       ],
-      "datasourceTemplate": "github-tags",
+      "datasourceTemplate": "github-releases",
       "versioningTemplate": "loose",
       "depNameTemplate": "typst/typst"
     }
