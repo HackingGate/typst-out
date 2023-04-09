@@ -19,9 +19,9 @@
         "^\\.github/workflows/test_typst_out_action\\.yml$"
       ],
       "matchStrings": [
-        "- (?<currentDigest>.*?) # latest main"
+        "- (?<currentDigest>.*?) # latest main commit"
       ],
-      "depNameTemplate": "typst/typst/main",
+      "depNameTemplate": "typst/typst",
       "lookupNameTemplate": "https://github.com/typst/typst.git",
       "datasourceTemplate": "git-refs",
       "currentValueTemplate": "main"
@@ -31,11 +31,11 @@
         "^\\.github/workflows/test_typst_out_action\\.yml$"
       ],
       "matchStrings": [
-        "- (?<currentValue>.*?) # latest release"
+        "- (?<currentValue>.*?) # latest release version"
       ],
       "datasourceTemplate": "github-releases",
       "versioningTemplate": "loose",
-      "depNameTemplate": "typst/typst/release"
+      "depNameTemplate": "typst/typst"
     }
   ]
 }

@@ -13,8 +13,8 @@ jobs:
     strategy:
       matrix:
         typst_ref:
-          - 75461675c4e57675174d98060124c9e13beaf7e4 # latest main
-          - v0.1.0 # latest release
+          - 75461675c4e57675174d98060124c9e13beaf7e4 # latest main commit
+          - v0.1.0 # latest release version
         os: [ubuntu-latest, macos-latest, windows-latest]
       fail-fast: false
     runs-on: ${{ matrix.os }}
