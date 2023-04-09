@@ -19,12 +19,12 @@
         "^\\.github/workflows/test_typst_out_action\\.yml$"
       ],
       "matchStrings": [
-        "- (?<currentValue>.*?) # latest main"
+        "- (?<currentDigest>.*?) # latest main"
       ],
       "depNameTemplate": "typst/typst/main",
       "lookupNameTemplate": "https://github.com/typst/typst.git",
       "datasourceTemplate": "git-refs",
-      "versioningTemplate": "git"
+      "currentValueTemplate": "main"
     },
     {
       "fileMatch": [
