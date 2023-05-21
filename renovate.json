@@ -33,7 +33,7 @@
       "matchStrings": [
         "- (?<currentValue>.*?) # latest release version"
       ],
-      "datasourceTemplate": "github-tags",
+      "datasourceTemplate": "github-releases",
       "versioningTemplate": "loose",
       "depNameTemplate": "typst/typst"
     }
