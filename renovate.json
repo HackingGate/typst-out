@@ -37,5 +37,8 @@
       "versioningTemplate": "loose",
       "depNameTemplate": "typst/typst"
     }
-  ]
+  ],
+  "pre-commit": {
+    "enabled": true
+  }
 }
