@@ -120,7 +120,13 @@ runs:
         echo "Fonts path: $fonts_path"
         find . -name "*.typ" -not -name "template.typ" | while read -r file; do
           echo "Compiling $file to ${file%.typ}.${outputextension}"
-          if ~/typst_build/typst --help | grep -q " compile "; then
+          if ~/typst_build/typst compile -h | grep -q " --font-path "; then
+            if [ "$fonts_path" = "" ]; then
+              ~/typst_build/typst compile "$file" "${file%.typ}.${outputextension}"
+            else
+              ~/typst_build/typst compile --font-path "$fonts_path" "$file" "${file%.typ}.${outputextension}"
+            fi
+          elif ~/typst_build/typst --help | grep -q " compile "; then
             if [ "$fonts_path" = "" ]; then
               ~/typst_build/typst compile "$file" "${file%.typ}.${outputextension}"
             else
@@ -128,7 +134,7 @@ runs:
             fi
           else
             if [ "$fonts_path" = "" ]; then
-              ~/typst_build/typst "$file" "${file%.typ}.${outputextension}"
+              ~/typst_build/typst compile "$file" "${file%.typ}.${outputextension}"
             else
               ~/typst_build/typst --font-path "$fonts_path" "$file" "${file%.typ}.${outputextension}"
             fi
