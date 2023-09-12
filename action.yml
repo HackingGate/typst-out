@@ -124,13 +124,13 @@ runs:
             if [ "$fonts_path" = "" ]; then
               ~/typst_build/typst compile "$file" "${file%.typ}.${outputextension}"
             else
-              ~/typst_build/typst compile "$file" "${file%.typ}.${outputextension}" --font-path "$fonts_path" 
+              ~/typst_build/typst compile "$file" "${file%.typ}.${outputextension}" -- --font-path "$fonts_path" 
             fi
           else
             if [ "$fonts_path" = "" ]; then
               ~/typst_build/typst "$file" "${file%.typ}.${outputextension}"
             else
-              ~/typst_build/typst "$file" "${file%.typ}.${outputextension}" --font-path "$fonts_path" 
+              ~/typst_build/typst "$file" "${file%.typ}.${outputextension}" -- --font-path "$fonts_path" 
             fi
           fi
         done
