@@ -1,19 +1,21 @@
 # Typst Out GitHub Action
-This GitHub action automatically builds Typst files in your repository using a custom Typst ref and uploads the output files as artifacts.
+
+This GitHub action builds Typst files in your repository using a custom Typst ref, producing configurable output files and uploading them as artifacts.
 
 [![Test Typst Out Action](https://github.com/HackingGate/typst-out/actions/workflows/test_typst_out_action.yml/badge.svg)](https://github.com/HackingGate/typst-out/actions/workflows/test_typst_out_action.yml)
 
 ## Features
 
-- Uses a custom Typst ref to build your Typst files
-- Allows for setting the number of days to retain the PDFs as artifacts
-- Supports custom naming of the artifacts
-- Configurable output file extensions
-- Allows for using a custom template file
+- Configurable Typst ref for building your Typst files.
+- Option to set the number of days to retain the compiled outputs as artifacts.
+- Customizable naming convention for the artifacts.
+- Configurable output file extensions.
+- Ability to use a custom template file.
+- Optional use of built-in Typst fonts or specify your own font path.
 
 ## Usage
 
-To use the Typst Out action in your GitHub repository, create a new workflow file (e.g., `.github/workflows/typst_out.yml`) and add the following content:
+To leverage the Typst Out action in your GitHub repository, create a new workflow file (e.g., `.github/workflows/typst_out.yml`) and add the content shown below:
 
 ```yaml
 on:
@@ -38,7 +40,7 @@ jobs:
           template_file: template.typ
 ```
 
-To use the latest release of Typst, you can use the `pozetroninc/github-action-get-latest-release` action to get the latest release from `typst/typst`.
+To use the latest release of Typst, you can utilize the `pozetroninc/github-action-get-latest-release` action to fetch the latest release from `typst/typst`.
 
 ```yaml
     steps:
@@ -59,45 +61,24 @@ To use the latest release of Typst, you can use the `pozetroninc/github-action-g
 
 ## Inputs
 
-| Name | Description | Required | Default |
-| --- | --- | --- | --- |
-| `typst_ref` | The ref of Typst to use for building | No | `main` |
-| `retention_days` | The number of days to retain the PDFs as artifacts | No | `7` |
-| `artifacts_name` | The name of the artifacts to upload | No | `typst_output` |
-| `output_extensions` | The extensions of the output files | No | `pdf` |
-| `template_file` | The template file to use | No | `template.typ` |
+| Name                | Description                                                  | Required | Default        |
+| ------------------- | ------------------------------------------------------------ | -------- | -------------- |
+| `typst_ref`         | The ref of Typst for building                                | No       | `main`         |
+| `retention_days`    | Number of days to keep the PDFs as artifacts                 | No       | `7`            |
+| `artifacts_name`    | Name for the uploaded artifacts                              | No       | `typst_output` |
+| `output_extensions` | Output file extensions                                       | No       | `pdf`          |
+| `template_file`     | Template file to utilize                                     | No       | `template.typ` |
+| `use_typst_fonts`   | Decide whether to use built-in Typst fonts                   | No       | `true`         |
+| `fonts_path`        | Specify the path for custom fonts (if not using Typst fonts) | No       | `''`           |
 
 ## Caching
 
-In this GitHub action, caching is used to store and retrieve the build artifacts and dependencies to speed up the action's runtime. Caching helps avoid rebuilding the Typst binary and reinstalling the Rust dependencies each time the action is run, saving time and resources.
+This GitHub action employs caching to speedily store and recover build artifacts and dependencies. This optimizes the action's execution time by preventing the need to rebuild the Typst binary and reacquire Rust dependencies on every run.
 
-There are three caching steps in this action:
+There are three main caching phases in this action:
 
-1. **Cache Typst build**: This step caches the built Typst binary using the `actions/cache@v3` action. The cache key is created using the Typst commit SHA from the specified `typst_ref`. When the action is run, it checks if there's a cache hit (i.e., if a cached Typst binary exists for the given commit SHA). If there's a cache hit, the action skips the subsequent steps for setting up Rust and building Typst, and directly proceeds to the step for compiling Typst files.
+1.**Cache Typst build**: This phase caches the constructed Typst binary using the `actions/cache@v3` action. The cache key is determined by the Typst commit SHA from the given `typst_ref`. If a cache hit is detected (i.e., a stored Typst binary is found for the commit SHA), the subsequent Rust setup and Typst building steps are skipped, directly proceeding to Typst file compilation.
 
-```yaml
-- name: Cache Typst build
-  uses: actions/cache@v3
-  id: typst_cache
-  with:
-    path: ~/typst_build
-    key: typst-${{ steps.typst_commit_sha.outputs.sha }}
-```
+2.**Cache Typst fonts**: This caches fonts from `typst/assets/fonts` with the `actions/cache@v3` action. The cache key is again derived from the Typst commit SHA. If there's a cache hit, the font acquisition step is omitted.
 
-2. **Cache Typst font**: This step caches the fonts in the `typst/assets/fonts` directory using the `actions/cache@v3` action. The cache key is created using the Typst commit SHA from the specified `typst_ref`. When the action is run, it checks if there's a cache hit (i.e., if a cached set of fonts exists for the given commit SHA). If there's a cache hit, the action skips the subsequent step for fetching the fonts and proceeds to the next steps in the workflow. Caching the fonts helps reduce the time taken to install fonts in future runs.
-
-```yaml
-- name: Cache Typst fonts
-  uses: actions/cache@v3
-  with:
-    path: ~/typst_fonts
-    key: fonts-${{ steps.typst_commit_sha.outputs.sha }}
-```
-
-3. **Cache Rust**: If there's no cache hit for the Typst build, this step caches the Rust dependencies using the `Swatinem/rust-cache@v2` action. By caching the Rust dependencies, the action can significantly reduce the time taken to set up Rust and compile the Typst binary in future runs.
-
-```yaml
-- name: Cache Rust
-  if: steps.typst_cache.outputs.cache-hit != 'true'
-  uses: Swatinem/rust-cache@v2
-```
+3.**Cache Rust**: When a cache miss occurs for the Typst build, Rust dependencies are cached using the `Swatinem/rust-cache@v2` action. This substantially diminishes setup time for Rust and the Typst binary compilation in subsequent runs.
