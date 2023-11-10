@@ -14,7 +14,7 @@ jobs:
       matrix:
         typst_ref:
           - 995fc40363252a5dbf4b19b15b847b5ab23fc739 # latest main commit
-          - v0.8.0 # latest release version
+          - v0.9.0 # latest release version
         os: [ubuntu-latest, macos-latest, windows-latest]
       fail-fast: false
     runs-on: ${{ matrix.os }}
