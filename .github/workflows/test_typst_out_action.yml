@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         typst_ref:
-          - 41c0dae2097ae4368c259bd1b1b10ef6667bb850 # latest main commit
+          - 81ff34d80dac76c345c54e36b7bd203efa3be710 # latest main commit
           - v0.10.0 # latest release version
         os: [ubuntu-latest, macos-latest, windows-latest]
       fail-fast: false
