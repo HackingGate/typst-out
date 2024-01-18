@@ -42,14 +42,14 @@ runs:
         echo "Typst ref: ${{ inputs.typst_ref }}" 
 
     - name: Cache Typst build
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       id: typst_cache_build
       with:
         path: ~/typst_build
         key: typst-build-${{ inputs.typst_ref }}-${{ runner.os }}
 
     - name: Cache Typst fonts
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       id: typst_cache_fonts
       with:
         path: ~/typst_fonts
