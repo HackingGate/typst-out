@@ -25,16 +25,18 @@ jobs:
           submodules: true
 
       - name: Download Noto Fonts
+        shell: bash
         run: |
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
             sudo apt-get update && sudo apt-get install -y fonts-noto
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            brew install font-noto
+            brew search '/font-noto-.*/' | awk '{ print $1 }' | xargs -I{} brew install --cask {} || true
           elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             choco install noto-fonts -y
           fi
 
       - name: Verify Fonts Directory
+        shell: bash
         run: |
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             echo "Windows Fonts Path: C:\\Windows\\Fonts"
@@ -49,7 +51,6 @@ jobs:
         run: |
           mkdir -p test
           echo "
-            #set font: ("Noto Sans", weight: "regular")
             Chinese: 你好，世界！
             Japanese: こんにちは、世界！
             Korean: 안녕하세요, 세상아!
