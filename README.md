@@ -68,7 +68,6 @@ To use the latest release of Typst, you can utilize the `pozetroninc/github-acti
 | `artifacts_name`    | Name for the uploaded artifacts                              | No       | `typst_output` |
 | `output_extensions` | Output file extensions                                       | No       | `pdf`          |
 | `template_file`     | Template file to utilize                                     | No       | `template.typ` |
-| `use_typst_fonts`   | Decide whether to use built-in Typst fonts                   | No       | `true`         |
 | `fonts_path`        | Specify the path for custom fonts (if not using Typst fonts) | No       | `''`           |
 
 ## Caching

@@ -90,13 +90,6 @@ runs:
           exit 1
         fi
 
-    - name: Install Typst fonts
-      if: steps.typst_cache_fonts.outputs.cache-hit != 'true'
-      shell: bash
-      run: |
-        mkdir -p ~/typst_fonts
-        cp typst/assets/fonts/* ~/typst_fonts
-
     - name: Delete Typst
       if: steps.typst_cache_build.outputs.cache-hit != 'true' || steps.typst_cache_fonts.outputs.cache-hit != 'true'
       shell: bash
@@ -112,11 +105,6 @@ runs:
         echo "Template file: $templatefile"
         echo "Output extension: $outputextension"
         fonts_path="${{ inputs.fonts_path }}"
-        use_typst_fonts="${{ inputs.use_typst_fonts }}"
-        if [ "$use_typst_fonts" = "true" ]; then
-          echo "Using Typst fonts"
-          fonts_path="~/typst_fonts"
-        fi
         echo "Fonts path: $fonts_path"
         find . -name "*.typ" -not -name "template.typ" | while read -r file; do
           echo "Compiling $file to ${file%.typ}.${outputextension}"
