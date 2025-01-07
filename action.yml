@@ -24,10 +24,6 @@ inputs:
     description: 'The template file to use'
     required: false
     default: 'template.typ'
-  use_typst_fonts:
-    description: 'Whether to use the fonts provided by Typst'
-    required: false
-    default: true
   fonts_path:
     description: 'The path to the fonts to use'
     required: false
