@@ -11,7 +11,7 @@ This GitHub action builds Typst files in your repository using a custom Typst re
 - Customizable naming convention for the artifacts.
 - Configurable output file extensions.
 - Ability to use a custom template file.
-- Optional use of built-in Typst fonts or specify your own font path.
+- Specify your own font path.
 
 ## Usage
 
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Build Typst files
         uses: HackingGate/typst-out@v1
@@ -45,7 +45,7 @@ To use the latest release of Typst, you can utilize the `pozetroninc/github-acti
 ```yaml
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Get latest release of Typst
         id: get-latest-release
