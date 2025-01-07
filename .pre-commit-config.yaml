@@ -3,3 +3,11 @@ repos:
     rev: 39.92.0
     hooks:
       - id: renovate-config-validator
+
+  - repo: local
+    hooks:
+      - id: prettier
+        name: Prettify Code
+        entry: npx prettier --write
+        language: system
+        exclude: "^templates/.*"
