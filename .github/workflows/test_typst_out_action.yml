@@ -32,23 +32,36 @@ jobs:
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
             brew install --cask font-noto-sans-cjk
           elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            # Download the fonts
-            curl -L -o noto-cjk.zip https://github.com/googlefonts/noto-cjk/releases/latest/download/NotoSansCJK.ttc.zip
-
-            # Unzip the fonts
-            powershell -Command "Expand-Archive -Path noto-cjk.zip -DestinationPath C:\\Fonts -Force"
-
-            # Create Fonts directory if it doesn't exist
-            if not exist "C:\\Fonts" mkdir C:\\Fonts
-
-            # Move fonts to Fonts directory
-            move C:\\Fonts\\*.ttc C:\\Windows\\Fonts\\
-
-            # Register fonts
-            reg add "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts" /v "Noto Sans CJK (TrueType)" /t REG_SZ /d "NotoSansCJK.ttc" /f
-
-            echo "Fonts installed successfully on Windows."
+            echo "This step will be handled in a separate Windows-only step."
           fi
+
+      - name: Install Noto Sans CJK (Windows)
+        if: runner.os == 'Windows'
+        # Use PowerShell on Windows
+        shell: pwsh
+        run: |
+          Write-Host "Downloading Noto Sans CJK..."
+          $ProgressPreference = 'SilentlyContinue'
+          # 1. Download the fonts
+          Invoke-WebRequest `
+            -Uri "https://github.com/googlefonts/noto-cjk/releases/latest/download/NotoSansCJK.ttc.zip" `
+            -OutFile "noto-cjk.zip"
+          # 2. Create a destination folder (C:\Fonts) if it doesn't exist
+          if (!(Test-Path "C:\Fonts")) {
+            New-Item -ItemType Directory -Path "C:\Fonts" | Out-Null
+          }
+          # 3. Unzip to C:\Fonts
+          Expand-Archive -Path "noto-cjk.zip" -DestinationPath "C:\Fonts" -Force
+          # 4. Move the .ttc file(s) into C:\Windows\Fonts
+          Move-Item -Path "C:\Fonts\*.ttc" -Destination "C:\Windows\Fonts" -Force
+          # 5. Register the font in the Windows Registry
+          New-ItemProperty `
+            -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts" `
+            -Name "Noto Sans CJK (TrueType)" `
+            -PropertyType String `
+            -Value "NotoSansCJK.ttc" `
+            -Force
+          Write-Host "Fonts installed successfully on Windows."
 
       - name: Verify Fonts Directory
         shell: bash
