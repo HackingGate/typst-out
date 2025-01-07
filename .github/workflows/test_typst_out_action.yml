@@ -33,6 +33,9 @@ jobs:
             brew install --cask font-noto-sans-cjk
           elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             echo "This step will be handled in a separate Windows-only step."
+          else
+            echo "Unsupported OS: ${{ matrix.os }}"
+            exit 1
           fi
 
       - name: Install Noto Sans CJK (Windows)
@@ -44,7 +47,7 @@ jobs:
           $ProgressPreference = 'SilentlyContinue'
           # 1. Download the fonts
           Invoke-WebRequest `
-            -Uri "https://github.com/googlefonts/noto-cjk/releases/latest/download/NotoSansCJK.ttc.zip" `
+            -Uri "https://github.com/googlefonts/noto-cjk/releases/latest/download/01_NotoSerifCJK.ttc.zip" `
             -OutFile "noto-cjk.zip"
           # 2. Create a destination folder (C:\Fonts) if it doesn't exist
           if (!(Test-Path "C:\Fonts")) {
