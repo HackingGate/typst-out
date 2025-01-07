@@ -32,7 +32,22 @@ jobs:
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
             brew install --cask font-noto-sans-cjk
           elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            choco install google-noto-cjk-fonts -y
+            # Download the fonts
+            curl -L -o noto-cjk.zip https://github.com/googlefonts/noto-cjk/releases/latest/download/NotoSansCJK.ttc.zip
+
+            # Unzip the fonts
+            powershell -Command "Expand-Archive -Path noto-cjk.zip -DestinationPath C:\\Fonts -Force"
+
+            # Create Fonts directory if it doesn't exist
+            if not exist "C:\\Fonts" mkdir C:\\Fonts
+
+            # Move fonts to Fonts directory
+            move C:\\Fonts\\*.ttc C:\\Windows\\Fonts\\
+
+            # Register fonts
+            reg add "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts" /v "Noto Sans CJK (TrueType)" /t REG_SZ /d "NotoSansCJK.ttc" /f
+
+            echo "Fonts installed successfully on Windows."
           fi
 
       - name: Verify Fonts Directory
