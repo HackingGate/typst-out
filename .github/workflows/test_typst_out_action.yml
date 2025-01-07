@@ -24,15 +24,16 @@ jobs:
         with:
           submodules: true
 
-      - name: Download Noto Fonts
+      - name: Install Noto Sans CJK
         shell: bash
         run: |
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-            sudo apt-get update && sudo apt-get install -y fonts-noto
+            sudo apt-get update && sudo apt-get install -y fonts-noto-cjk
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            brew search '/font-noto-.*/' | awk '{ print $1 }' | xargs -I{} brew install --cask {} || true
+            brew tap homebrew/cask-fonts
+            brew install --cask font-noto-sans-cjk
           elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            choco install noto-fonts -y
+            choco install google-noto-cjk-fonts -y
           fi
 
       - name: Verify Fonts Directory
