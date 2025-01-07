@@ -83,8 +83,13 @@ jobs:
         run: |
           mkdir -p test
           cat <<EOF > test/cjk.typ
+          #set text(font: "Noto Sans CJK TC")
           Chinese: 你好，世界！
+
+          #set text(font: "Noto Sans CJK JP")
           Japanese: こんにちは、世界！
+
+          #set text(font: "Noto Sans CJK KR")
           Korean: 안녕하세요, 세상아!
           EOF
 
@@ -94,8 +99,13 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path test
           @"
+          #set text(font: "Noto Sans CJK TC")
           Chinese: 你好，世界！
+
+          #set text(font: "Noto Sans CJK JP")
           Japanese: こんにちは、世界！
+
+          #set text(font: "Noto Sans CJK KR")
           Korean: 안녕하세요, 세상아!
           "@ | Out-File -FilePath .\test\cjk.typ -Encoding utf8
 
