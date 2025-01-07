@@ -61,14 +61,13 @@ steps:
 
 ## Inputs
 
-| Name                | Description                                                  | Required | Default        |
-| ------------------- | ------------------------------------------------------------ | -------- | -------------- |
-| `typst_ref`         | The ref of Typst for building                                | No       | `main`         |
-| `retention_days`    | Number of days to keep the PDFs as artifacts                 | No       | `7`            |
-| `artifacts_name`    | Name for the uploaded artifacts                              | No       | `typst_output` |
-| `output_extensions` | Output file extensions                                       | No       | `pdf`          |
-| `template_file`     | Template file to utilize                                     | No       | `template.typ` |
-| `fonts_path`        | Specify the path for custom fonts (if not using Typst fonts) | No       | `''`           |
+| Name                | Description                                  | Required | Default        |
+| ------------------- | -------------------------------------------- | -------- | -------------- |
+| `typst_ref`         | The ref of Typst for building                | No       | `main`         |
+| `retention_days`    | Number of days to keep the PDFs as artifacts | No       | `7`            |
+| `artifacts_name`    | Name for the uploaded artifacts              | No       | `typst_output` |
+| `output_extensions` | Output file extensions                       | No       | `pdf`          |
+| `template_file`     | Template file to utilize                     | No       | `template.typ` |
 
 ## Caching
 

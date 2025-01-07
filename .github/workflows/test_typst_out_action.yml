@@ -91,10 +91,6 @@ jobs:
           artifacts_name: typst_output_${{ matrix.typst_ref }}_${{ matrix.os }}
           output_extensions: pdf
           template_file: template.typ
-          # fonts_path: |
-          #   ${{ matrix.os == 'windows-latest' && 'C:\\Windows\\Fonts' ||
-          #       matrix.os == 'macos-latest' && '/Library/Fonts' ||
-          #       '/usr/share/fonts/noto' }}
 
       # This step is optional; it can be used to print the generated PDF file
       - name: Display generated PDF file

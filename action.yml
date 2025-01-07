@@ -24,10 +24,6 @@ inputs:
     description: "The template file to use"
     required: false
     default: "template.typ"
-  fonts_path:
-    description: "The path to the fonts to use"
-    required: false
-    default: ""
 
 runs:
   using: "composite"
@@ -100,29 +96,9 @@ runs:
         echo "Compiling Typst files"
         echo "Template file: $templatefile"
         echo "Output extension: $outputextension"
-        fonts_path="${{ inputs.fonts_path }}"
-        echo "Fonts path: $fonts_path"
         find . -name "*.typ" -not -name "template.typ" | while read -r file; do
           echo "Compiling $file to ${file%.typ}.${outputextension}"
-          if ~/typst_build/typst compile -h | grep -q " --font-path "; then
-            if [ "$fonts_path" = "" ]; then
-              ~/typst_build/typst compile "$file" "${file%.typ}.${outputextension}"
-            else
-              ~/typst_build/typst compile --font-path "$fonts_path" "$file" "${file%.typ}.${outputextension}"
-            fi
-          elif ~/typst_build/typst --help | grep -q " compile "; then
-            if [ "$fonts_path" = "" ]; then
-              ~/typst_build/typst compile "$file" "${file%.typ}.${outputextension}"
-            else
-              ~/typst_build/typst --font-path "$fonts_path" compile "$file" "${file%.typ}.${outputextension}"
-            fi
-          else
-            if [ "$fonts_path" = "" ]; then
-              ~/typst_build/typst compile "$file" "${file%.typ}.${outputextension}"
-            else
-              ~/typst_build/typst --font-path "$fonts_path" "$file" "${file%.typ}.${outputextension}"
-            fi
-          fi
+          ~/typst_build/typst compile "$file" "${file%.typ}.${outputextension}"
         done
         echo "Compiled Typst files"
         echo "Output files:"
