@@ -46,15 +46,27 @@ jobs:
             echo "Linux Fonts Path: /usr/share/fonts/noto"
           fi
 
-      - name: Create cjk.typ for test
+      - name: Create cjk.typ (Unix)
+        if: runner.os != 'Windows'
         shell: bash
         run: |
           mkdir -p test
-          echo "
-            Chinese: 你好，世界！
-            Japanese: こんにちは、世界！
-            Korean: 안녕하세요, 세상아!
-          " > test/cjk.typ
+          cat <<EOF > test/cjk.typ
+          Chinese: 你好，世界！
+          Japanese: こんにちは、世界！
+          Korean: 안녕하세요, 세상아!
+          EOF
+
+      - name: Create cjk.typ (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path test
+          @"
+          Chinese: 你好，世界！
+          Japanese: こんにちは、世界！
+          Korean: 안녕하세요, 세상아!
+          "@ | Out-File -FilePath .\test\cjk.typ -Encoding utf8
 
       - name: Test Typst Out Action
         uses: ./
@@ -64,10 +76,10 @@ jobs:
           artifacts_name: typst_output_${{ matrix.typst_ref }}_${{ matrix.os }}
           output_extensions: pdf
           template_file: template.typ
-          fonts_path: |
-            ${{ matrix.os == 'windows-latest' && 'C:\\Windows\\Fonts' || 
-                matrix.os == 'macos-latest' && '/Library/Fonts' || 
-                '/usr/share/fonts/noto' }}
+          # fonts_path: |
+          #   ${{ matrix.os == 'windows-latest' && 'C:\\Windows\\Fonts' ||
+          #       matrix.os == 'macos-latest' && '/Library/Fonts' ||
+          #       '/usr/share/fonts/noto' }}
 
       # This step is optional; it can be used to print the generated PDF file
       - name: Display generated PDF file
