@@ -24,15 +24,90 @@ jobs:
         with:
           submodules: true
 
-      - name: Create cjk.typ for test
+      - name: Install Noto Sans CJK
+        shell: bash
+        run: |
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            sudo apt-get update && sudo apt-get install -y fonts-noto-cjk
+          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            brew install --cask font-noto-sans-cjk
+          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            echo "This step will be handled in a separate Windows-only step."
+          else
+            echo "Unsupported OS: ${{ matrix.os }}"
+            exit 1
+          fi
+
+      - name: Install Noto Sans CJK (Windows)
+        if: runner.os == 'Windows'
+        # Use PowerShell on Windows
+        shell: pwsh
+        run: |
+          Write-Host "Downloading Noto Sans CJK..."
+          $ProgressPreference = 'SilentlyContinue'
+          # 1. Download the fonts
+          Invoke-WebRequest `
+            -Uri "https://github.com/googlefonts/noto-cjk/releases/latest/download/01_NotoSerifCJK.ttc.zip" `
+            -OutFile "noto-cjk.zip"
+          # 2. Create a destination folder (C:\Fonts) if it doesn't exist
+          if (!(Test-Path "C:\Fonts")) {
+            New-Item -ItemType Directory -Path "C:\Fonts" | Out-Null
+          }
+          # 3. Unzip to C:\Fonts
+          Expand-Archive -Path "noto-cjk.zip" -DestinationPath "C:\Fonts" -Force
+          # 4. Move the .ttc file(s) into C:\Windows\Fonts
+          Move-Item -Path "C:\Fonts\*.ttc" -Destination "C:\Windows\Fonts" -Force
+          # 5. Register the font in the Windows Registry
+          New-ItemProperty `
+            -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts" `
+            -Name "Noto Sans CJK (TrueType)" `
+            -PropertyType String `
+            -Value "NotoSansCJK.ttc" `
+            -Force
+          Write-Host "Fonts installed successfully on Windows."
+
+      - name: Verify Fonts Directory
+        shell: bash
+        run: |
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            echo "Windows Fonts Path: C:\\Windows\\Fonts"
+          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            echo "MacOS Fonts Path: /Library/Fonts"
+          else
+            echo "Linux Fonts Path: /usr/share/fonts/noto"
+          fi
+
+      - name: Create cjk.typ (Unix)
+        if: runner.os != 'Windows'
         shell: bash
         run: |
           mkdir -p test
-          echo "
-            Chinese: 你好，世界！
-            Japanese: こんにちは、世界！
-            Korean: 안녕하세요, 세상아!
-          " > test/cjk.typ
+          cat <<EOF > test/cjk.typ
+          #set text(font: "Noto Sans CJK TC")
+          Chinese: 你好，世界！
+
+          #set text(font: "Noto Sans CJK JP")
+          Japanese: こんにちは、世界！
+
+          #set text(font: "Noto Sans CJK KR")
+          Korean: 안녕하세요, 세상아!
+          EOF
+
+      - name: Create cjk.typ (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path test
+          @"
+          #set text(font: "Noto Sans CJK TC")
+          Chinese: 你好，世界！
+
+          #set text(font: "Noto Sans CJK JP")
+          Japanese: こんにちは、世界！
+
+          #set text(font: "Noto Sans CJK KR")
+          Korean: 안녕하세요, 세상아!
+          "@ | Out-File -FilePath .\test\cjk.typ -Encoding utf8
 
       - name: Test Typst Out Action
         uses: ./
@@ -42,8 +117,6 @@ jobs:
           artifacts_name: typst_output_${{ matrix.typst_ref }}_${{ matrix.os }}
           output_extensions: pdf
           template_file: template.typ
-          use_typst_fonts: true
-          fonts_path: ''
 
       # This step is optional; it can be used to print the generated PDF file
       - name: Display generated PDF file

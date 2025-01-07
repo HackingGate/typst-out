@@ -21,7 +21,7 @@ To leverage the Typst Out action in your GitHub repository, create a new workflo
 on:
   push:
     paths:
-      - '**.typ'
+      - "**.typ"
 
 jobs:
   build_typst:
@@ -43,32 +43,31 @@ jobs:
 To use the latest release of Typst, you can utilize the `pozetroninc/github-action-get-latest-release` action to fetch the latest release from `typst/typst`.
 
 ```yaml
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+steps:
+  - name: Checkout repository
+    uses: actions/checkout@v4
 
-      - name: Get latest release of Typst
-        id: get-latest-release
-        uses: pozetroninc/github-action-get-latest-release@master
-        with:
-          repository: typst/typst
+  - name: Get latest release of Typst
+    id: get-latest-release
+    uses: pozetroninc/github-action-get-latest-release@master
+    with:
+      repository: typst/typst
 
-      - name: Build Typst files
-        uses: HackingGate/typst-out@main
-        with:
-          typst_ref: ${{ steps.get-latest-release.outputs.release }}
+  - name: Build Typst files
+    uses: HackingGate/typst-out@main
+    with:
+      typst_ref: ${{ steps.get-latest-release.outputs.release }}
 ```
 
 ## Inputs
 
-| Name                | Description                                                  | Required | Default        |
-| ------------------- | ------------------------------------------------------------ | -------- | -------------- |
-| `typst_ref`         | The ref of Typst for building                                | No       | `main`         |
-| `retention_days`    | Number of days to keep the PDFs as artifacts                 | No       | `7`            |
-| `artifacts_name`    | Name for the uploaded artifacts                              | No       | `typst_output` |
-| `output_extensions` | Output file extensions                                       | No       | `pdf`          |
-| `template_file`     | Template file to utilize                                     | No       | `template.typ` |
-| `fonts_path`        | Specify the path for custom fonts (if not using Typst fonts) | No       | `''`           |
+| Name                | Description                                  | Required | Default        |
+| ------------------- | -------------------------------------------- | -------- | -------------- |
+| `typst_ref`         | The ref of Typst for building                | No       | `main`         |
+| `retention_days`    | Number of days to keep the PDFs as artifacts | No       | `7`            |
+| `artifacts_name`    | Name for the uploaded artifacts              | No       | `typst_output` |
+| `output_extensions` | Output file extensions                       | No       | `pdf`          |
+| `template_file`     | Template file to utilize                     | No       | `template.typ` |
 
 ## Caching
 
