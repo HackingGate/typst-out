@@ -61,7 +61,6 @@ jobs:
 
       - name: Install Noto Sans CJK (Windows)
         if: runner.os == 'Windows'
-        # Use PowerShell on Windows
         shell: pwsh
         run: |
           Write-Host "Downloading Noto Sans CJK..."
@@ -139,7 +138,6 @@ jobs:
           output_extensions: pdf
           template_file: template.typ
 
-      # This step is optional; it can be used to print the generated PDF file
       - name: Display generated PDF file
         shell: bash
         run: |
