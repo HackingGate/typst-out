@@ -4,10 +4,10 @@ branding:
   icon: "file-text"
   color: "blue"
 inputs:
-  typst_ref:
-    description: "The ref of Typst to use for building"
+  version:
+    description: "The version or ref of Typst to use for building"
     required: false
-    default: "main"
+    default: "latest"
   retention_days:
     description: "The number of days to retain the PDFs as artifacts"
     required: false
@@ -33,19 +33,25 @@ runs:
       run: |
         echo "Typst ref: ${{ inputs.typst_ref }}"
 
+    - name: Check Version
+      id: check_version
+      shell: bash
+      run: |
+        if [[ "${{ inputs.version }}" == "latest" ]]; then
+          echo "Typst version: latest"
+          typst_ref=$(curl -s https://api.github.com/repos/typst/typst/releases/latest | jq -r '.tag_name')
+        else
+          echo "Typst version: ${{ inputs.version }}"
+          typst_ref=${{ inputs.version }}
+        fi
+        echo "typst_ref=$typst_ref" >> $GITHUB_OUTPUT
+
     - name: Cache Typst build
       uses: actions/cache@v4
       id: typst_cache_build
       with:
         path: ~/typst_build
-        key: typst-build-${{ inputs.typst_ref }}-${{ runner.os }}
-
-    - name: Cache Typst fonts
-      uses: actions/cache@v4
-      id: typst_cache_fonts
-      with:
-        path: ~/typst_fonts
-        key: typst-fonts-${{ inputs.typst_ref }}
+        key: typst-build-${{ steps.check_version.outputs.typst_ref }}-${{ runner.os }}
 
     - name: Setup Rust
       if: steps.typst_cache_build.outputs.cache-hit != 'true'
@@ -57,14 +63,13 @@ runs:
       if: steps.typst_cache_build.outputs.cache-hit != 'true'
       uses: Swatinem/rust-cache@v2
 
-    # Use input typst_ref to checkout a specific ref of Typst
     - name: Checkout Typst
       if: steps.typst_cache_build.outputs.cache-hit != 'true' || steps.typst_cache_fonts.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
       with:
         repository: typst/typst
         path: typst
-        ref: ${{ inputs.typst_ref }}
+        ref: ${{ steps.check_version.outputs.typst_ref }}
 
     - name: Install Typst
       if: steps.typst_cache_build.outputs.cache-hit != 'true'
