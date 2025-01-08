@@ -132,9 +132,9 @@ jobs:
       - name: Test Typst Out Action
         uses: ./
         with:
-          typst_ref: ${{ matrix.typst_ref }}
+          typst_version: ${{ matrix.typst_version }}
           retention_days: 7
-          artifacts_name: typst_output_${{ matrix.typst_ref }}_${{ matrix.os }}
+          artifacts_name: typst_output_${{ matrix.typst_version }}_${{ matrix.os }}
           output_extensions: pdf
           template_file: template.typ
 
