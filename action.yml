@@ -36,6 +36,8 @@ runs:
     - name: Check Version
       id: check_version
       shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
       run: |
         function get_rate_limit() {
           rate_limit_remaining=$(gh api rate_limit --jq '.rate.remaining')
