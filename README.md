@@ -35,7 +35,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Typst files
-        uses: HackingGate/typst-out@v1
+        uses: HackingGate/typst-out@v3.0.0
         with:
           typst_version: latest
           retention_days: 7
@@ -45,12 +45,12 @@ jobs:
 
 ## Inputs
 
-| Name                | Description                                                               | Required | Default        |
-|---------------------|---------------------------------------------------------------------------|----------|----------------|
-| `typst_version`     | The version or ref of Typst to use for building                           | No       | `latest`       |
-| `retention_days`    | The number of days to retain the compiled PDFs (or other artifacts)       | No       | `7`            |
-| `artifacts_name`    | The name of the artifacts to upload                                       | No       | `typst_output` |
-| `template_file`     | The template file to use (if applicable)                                  | No       | `template.typ` |
+| Name             | Description                                                         | Required | Default        |
+| ---------------- | ------------------------------------------------------------------- | -------- | -------------- |
+| `typst_version`  | The version or ref of Typst to use for building                     | No       | `latest`       |
+| `retention_days` | The number of days to retain the compiled PDFs (or other artifacts) | No       | `7`            |
+| `artifacts_name` | The name of the artifacts to upload                                 | No       | `typst_output` |
+| `template_file`  | The template file to use (if applicable)                            | No       | `template.typ` |
 
 ## Caching
 
