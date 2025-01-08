@@ -4,10 +4,10 @@ branding:
   icon: "file-text"
   color: "blue"
 inputs:
-  typst_ref:
-    description: "The ref of Typst to use for building"
+  typst_version:
+    description: "The version or ref of Typst to use for building"
     required: false
-    default: "main"
+    default: "latest"
   retention_days:
     description: "The number of days to retain the PDFs as artifacts"
     required: false
@@ -33,19 +33,65 @@ runs:
       run: |
         echo "Typst ref: ${{ inputs.typst_ref }}"
 
+    - name: Check Version
+      id: check_version
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        function get_rate_limit() {
+          rate_limit_remaining=$(gh api rate_limit --jq '.rate.remaining')
+          reset_time=$(gh api rate_limit --jq '.rate.reset')
+          echo "Rate limit remaining: $rate_limit_remaining"
+        }
+
+        function wait_for_rate_limit() {
+          while [[ $rate_limit_remaining -eq 0 ]]; do
+            echo "Rate limit exceeded. Waiting for reset..."
+            sleep $((reset_time - $(date +%s)))
+            get_rate_limit
+          done
+        }
+
+        function fetch_typst_version() {
+          retry_count=0
+          max_retries=3
+          while true; do
+            if [[ "${{ inputs.typst_version }}" == "latest" ]]; then
+              echo "Typst version: latest"
+              typst_ref=$(gh api https://api.github.com/repos/typst/typst/releases/latest --jq '.tag_name' || echo "fail")
+            else
+              echo "Typst version: ${{ inputs.typst_version }}"
+              typst_ref=${{ inputs.typst_version }}
+            fi
+
+            if [[ $typst_ref != "fail" ]]; then
+              break
+            else
+              echo "Failed to fetch Typst version. Retrying in 5 seconds..."
+              ((retry_count++))
+              if [[ $retry_count -ge $max_retries ]]; then
+                echo "Max retries reached. Exiting with failure."
+                exit 1
+              fi
+              sleep 5
+            fi
+          done
+        }
+
+        get_rate_limit
+        wait_for_rate_limit
+        fetch_typst_version
+
+        echo "Using Typst ref: $typst_ref"
+        echo "typst_ref=$typst_ref" >> $GITHUB_OUTPUT
+
     - name: Cache Typst build
       uses: actions/cache@v4
       id: typst_cache_build
       with:
         path: ~/typst_build
-        key: typst-build-${{ inputs.typst_ref }}-${{ runner.os }}
-
-    - name: Cache Typst fonts
-      uses: actions/cache@v4
-      id: typst_cache_fonts
-      with:
-        path: ~/typst_fonts
-        key: typst-fonts-${{ inputs.typst_ref }}
+        key: typst-build-${{ steps.check_version.outputs.typst_ref }}-${{ runner.os }}
 
     - name: Setup Rust
       if: steps.typst_cache_build.outputs.cache-hit != 'true'
@@ -57,14 +103,13 @@ runs:
       if: steps.typst_cache_build.outputs.cache-hit != 'true'
       uses: Swatinem/rust-cache@v2
 
-    # Use input typst_ref to checkout a specific ref of Typst
     - name: Checkout Typst
       if: steps.typst_cache_build.outputs.cache-hit != 'true' || steps.typst_cache_fonts.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
       with:
         repository: typst/typst
         path: typst
-        ref: ${{ inputs.typst_ref }}
+        ref: ${{ steps.check_version.outputs.typst_ref }}
 
     - name: Install Typst
       if: steps.typst_cache_build.outputs.cache-hit != 'true'
