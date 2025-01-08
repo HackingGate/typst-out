@@ -88,11 +88,6 @@ runs:
       run: |
         rm -rf typst
 
-    - name: List Installed Fonts
-      shell: bash
-      run: |
-        ~/typst_build/typst fonts
-
     - name: Compile Typst files
       shell: bash
       run: |
