@@ -24,13 +24,33 @@ jobs:
         with:
           submodules: true
 
-      - name: Install Noto Sans CJK
+      - name: Install Fonts
         shell: bash
         run: |
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            # Install Noto Sans CJK fonts
             sudo apt-get update && sudo apt-get install -y fonts-noto-cjk
+            # Install other fonts may be used in the template
+            sudo apt-get install -y \
+            fonts-texgyre \
+            fonts-cascadia-code
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            # Install Not Sans CJK fonts
             brew install --cask font-noto-sans-cjk
+            # Install other fonts may be used in the template
+            echo "Installing TeX Gyre fonts..."
+            brew search font-tex-gyre | grep '^font-tex-gyre' | xargs -I{} brew install --cask {}
+            echo "Installing Syne fonts..."
+            brew search font-syne | grep '^font-syne' | xargs -I{} brew install --cask {}
+            echo "Installing Barlow fonts..."
+            brew search font-barlow | grep '^font-barlow' | xargs -I{} brew install --cask {}
+            echo "Installing New Computer Modern..."
+            # The actual cask name might be "font-new-computer-modern" or "font-newcomputermodern"
+            brew install --cask font-new-computer-modern
+            echo "Installing Cascadia Code..."
+            brew install --cask font-cascadia-code
+            echo "Installing PT Sans..."
+            brew install --cask font-pt-sans
           elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             echo "This step will be handled in a separate Windows-only step."
           else
@@ -40,14 +60,13 @@ jobs:
 
       - name: Install Noto Sans CJK (Windows)
         if: runner.os == 'Windows'
-        # Use PowerShell on Windows
         shell: pwsh
         run: |
           Write-Host "Downloading Noto Sans CJK..."
           $ProgressPreference = 'SilentlyContinue'
           # 1. Download the fonts
           Invoke-WebRequest `
-            -Uri "https://github.com/googlefonts/noto-cjk/releases/latest/download/01_NotoSerifCJK.ttc.zip" `
+            -Uri "https://github.com/notofonts/noto-cjk/releases/download/Sans2.004/00_NotoSansCJK.ttc.zip" `
             -OutFile "noto-cjk.zip"
           # 2. Create a destination folder (C:\Fonts) if it doesn't exist
           if (!(Test-Path "C:\Fonts")) {
@@ -118,7 +137,6 @@ jobs:
           output_extensions: pdf
           template_file: template.typ
 
-      # This step is optional; it can be used to print the generated PDF file
       - name: Display generated PDF file
         shell: bash
         run: |

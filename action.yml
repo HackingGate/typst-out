@@ -82,7 +82,7 @@ runs:
           exit 1
         fi
 
-    - name: Delete Typst
+    - name: Delete Typst Source
       if: steps.typst_cache_build.outputs.cache-hit != 'true' || steps.typst_cache_fonts.outputs.cache-hit != 'true'
       shell: bash
       run: |
