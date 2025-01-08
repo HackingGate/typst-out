@@ -91,7 +91,7 @@ runs:
     - name: List Installed Fonts
       shell: bash
       run: |
-        typst fonts
+        ~/typst_build/typst fonts
 
     - name: Compile Typst files
       shell: bash
