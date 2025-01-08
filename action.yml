@@ -37,13 +37,50 @@ runs:
       id: check_version
       shell: bash
       run: |
-        if [[ "${{ inputs.typst_version }}" == "latest" ]]; then
-          echo "Typst version: latest"
-          typst_ref=$(curl -s https://api.github.com/repos/typst/typst/releases/latest | jq -r '.tag_name')
-        else
-          echo "Typst version: ${{ inputs.typst_version }}"
-          typst_ref=${{ inputs.typst_version }}
-        fi
+        function get_rate_limit() {
+          rate_limit_remaining=$(gh api rate_limit --jq '.rate.remaining')
+          reset_time=$(gh api rate_limit --jq '.rate.reset')
+          echo "Rate limit remaining: $rate_limit_remaining"
+        }
+
+        function wait_for_rate_limit() {
+          while [[ $rate_limit_remaining -eq 0 ]]; do
+            echo "Rate limit exceeded. Waiting for reset..."
+            sleep $((reset_time - $(date +%s)))
+            get_rate_limit
+          done
+        }
+
+        function fetch_typst_version() {
+          retry_count=0
+          max_retries=3
+          while true; do
+            if [[ "${{ inputs.typst_version }}" == "latest" ]]; then
+              echo "Typst version: latest"
+              typst_ref=$(gh api https://api.github.com/repos/typst/typst/releases/latest --jq '.tag_name' || echo "fail")
+            else
+              echo "Typst version: ${{ inputs.typst_version }}"
+              typst_ref=${{ inputs.typst_version }}
+            fi
+
+            if [[ $typst_ref != "fail" ]]; then
+              break
+            else
+              echo "Failed to fetch Typst version. Retrying in 5 seconds..."
+              ((retry_count++))
+              if [[ $retry_count -ge $max_retries ]]; then
+                echo "Max retries reached. Exiting with failure."
+                exit 1
+              fi
+              sleep 5
+            fi
+          done
+        }
+
+        get_rate_limit
+        wait_for_rate_limit
+        fetch_typst_version
+
         echo "Using Typst ref: $typst_ref"
         echo "typst_ref=$typst_ref" >> $GITHUB_OUTPUT
 
