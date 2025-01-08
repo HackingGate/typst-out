@@ -15,7 +15,7 @@
     {
       "fileMatch": ["^\\.github/workflows/test_typst_out_action\\.yml$"],
       "matchStrings": [
-        "- (?<currentDigest>.*?) # specify a version (updated to the latest release by renovate)"
+        "- (?<currentDigest>.*?) # specify a commit hash (updated to the latest main hash by renovate)"
       ],
       "depNameTemplate": "typst/typst",
       "lookupNameTemplate": "https://github.com/typst/typst.git",
@@ -25,7 +25,7 @@
     {
       "fileMatch": ["^\\.github/workflows/test_typst_out_action\\.yml$"],
       "matchStrings": [
-        "- (?<currentValue>.*?) # specify a commit hash (updated to the latest main hash by renovate)"
+        "- (?<currentValue>.*?) # specify a version (updated to the latest release by renovate)"
       ],
       "datasourceTemplate": "github-releases",
       "versioningTemplate": "loose",
