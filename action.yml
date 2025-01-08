@@ -4,7 +4,7 @@ branding:
   icon: "file-text"
   color: "blue"
 inputs:
-  version:
+  typst_version:
     description: "The version or ref of Typst to use for building"
     required: false
     default: "latest"
@@ -37,13 +37,14 @@ runs:
       id: check_version
       shell: bash
       run: |
-        if [[ "${{ inputs.version }}" == "latest" ]]; then
+        if [[ "${{ inputs.typst_version }}" == "latest" ]]; then
           echo "Typst version: latest"
           typst_ref=$(curl -s https://api.github.com/repos/typst/typst/releases/latest | jq -r '.tag_name')
         else
-          echo "Typst version: ${{ inputs.version }}"
-          typst_ref=${{ inputs.version }}
+          echo "Typst version: ${{ inputs.typst_version }}"
+          typst_ref=${{ inputs.typst_version }}
         fi
+        echo "Using Typst ref: $typst_ref"
         echo "typst_ref=$typst_ref" >> $GITHUB_OUTPUT
 
     - name: Cache Typst build
