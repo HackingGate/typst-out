@@ -33,7 +33,6 @@ jobs:
             # Install other fonts may be used in the template
             sudo apt-get install -y \
             fonts-texgyre \
-            fonts-pt-sans \
             fonts-cascadia-code
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
             # Install Not Sans CJK fonts
