@@ -15,7 +15,7 @@ jobs:
         typst_version:
           - latest
           - v0.12.0 # specify a version
-          - a4ac4e656267e718a5cf60d1e959f74b2b7346f3 # specify a commit hash
+          - c22c47b9c97062309ed841679bb49fc15bb6a398 # specify a commit hash
         os: [ubuntu-latest, macos-latest, windows-latest]
       fail-fast: false
     runs-on: ${{ matrix.os }}
