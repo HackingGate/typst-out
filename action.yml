@@ -105,7 +105,7 @@ runs:
 
     - name: Checkout Typst
       if: steps.typst_cache_build.outputs.cache-hit != 'true' || steps.typst_cache_fonts.outputs.cache-hit != 'true'
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         repository: typst/typst
         path: typst
