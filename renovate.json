@@ -1,8 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended"
-  ],
+  "extends": ["config:recommended"],
   "git-submodules": {
     "enabled": true
   },
@@ -16,11 +14,9 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": [
-        "^\\.github/workflows/test_typst_out_action\\.yml$"
-      ],
+      "fileMatch": ["^\\.github/workflows/test_typst_out_action\\.yml$"],
       "matchStrings": [
-        "- (?<currentValue>.*?) # specify a version"
+        "TYPST_VERSION_TAG: (?<currentValue>.*?) # specify a version"
       ],
       "datasourceTemplate": "github-releases",
       "versioningTemplate": "loose",
@@ -28,11 +24,9 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "^\\.github/workflows/test_typst_out_action\\.yml$"
-      ],
+      "fileMatch": ["^\\.github/workflows/test_typst_out_action\\.yml$"],
       "matchStrings": [
-        "- (?<currentDigest>.*?) # specify a commit hash"
+        "TYPST_VERSION_HASH: (?<currentDigest>.*?) # specify a commit hash"
       ],
       "depNameTemplate": "typst/typst",
       "packageNameTemplate": "https://github.com/typst/typst.git",
