@@ -64,32 +64,33 @@ jobs:
             DIFF=$(git diff $BASE_REF HEAD -- .github/workflows/test_typst_out_action.yml || echo "")
             
             # Extract versions from diff - only ADDED lines (new versions)
-            ADDED_VERSIONS=$(echo "$DIFF" | grep -E '^\+.*"(latest|v[0-9]+\.[0-9]+\.[0-9]+|[0-9a-f]{40})"' || echo "")
-            REMOVED_VERSIONS=$(echo "$DIFF" | grep -E '^-.*"(latest|v[0-9]+\.[0-9]+\.[0-9]+|[0-9a-f]{40})"' || echo "")
+            # Match only lines that are array elements (contain whitespace, quote, value, quote, optional comma)
+            ADDED_VERSIONS=$(echo "$DIFF" | grep -E '^\+\s+"(latest|v[0-9]+\.[0-9]+\.[0-9]+|[0-9a-f]{40})"' || echo "")
+            REMOVED_VERSIONS=$(echo "$DIFF" | grep -E '^-\s+"(latest|v[0-9]+\.[0-9]+\.[0-9]+|[0-9a-f]{40})"' || echo "")
             
             if [ -n "$ADDED_VERSIONS" ]; then
-              # Extract added versions
-              NEW_VERSIONS=$(echo "$ADDED_VERSIONS" | sed -n 's/^+.*"\([^"]*\)".*/"\1"/p')
+              # Extract added versions - only capture the actual version string between quotes
+              NEW_VERSIONS=$(echo "$ADDED_VERSIONS" | sed -n 's/^+\s*"\([^"]*\)".*/\1/p')
               
               # Extract removed versions to filter out
-              OLD_VERSIONS=$(echo "$REMOVED_VERSIONS" | sed -n 's/^-.*"\([^"]*\)".*/\1/p')
+              OLD_VERSIONS=$(echo "$REMOVED_VERSIONS" | sed -n 's/^-\s*"\([^"]*\)".*/\1/p')
               
               # Filter out versions that were already present (not truly new)
               TRULY_NEW_VERSIONS=""
               for version in $NEW_VERSIONS; do
-                clean_version=$(echo "$version" | tr -d '"')
+                # version is already without quotes from sed
                 is_old=false
                 for old in $OLD_VERSIONS; do
-                  if [ "$clean_version" = "$old" ]; then
+                  if [ "$version" = "$old" ]; then
                     is_old=true
                     break
                   fi
                 done
                 if [ "$is_old" = false ]; then
                   if [ -z "$TRULY_NEW_VERSIONS" ]; then
-                    TRULY_NEW_VERSIONS="$version"
+                    TRULY_NEW_VERSIONS="\"$version\""
                   else
-                    TRULY_NEW_VERSIONS="$TRULY_NEW_VERSIONS,$version"
+                    TRULY_NEW_VERSIONS="$TRULY_NEW_VERSIONS,\"$version\""
                   fi
                 fi
               done
