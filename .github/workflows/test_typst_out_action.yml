@@ -70,15 +70,16 @@ jobs:
               # Extract changed versions from diff
               CHANGED_VERSIONS=$(echo "$VERSIONS_CHANGED" | sed -n 's/^+.*"\([^"]*\)".*/"\1"/p' | paste -sd, -)
               if [ -n "$CHANGED_VERSIONS" ]; then
+                # Specific versions changed - test only those on all platforms
                 echo "typst-version-matrix=[$CHANGED_VERSIONS]" >> $GITHUB_OUTPUT
                 echo 'os-matrix=["ubuntu-latest", "macos-latest", "windows-latest"]' >> $GITHUB_OUTPUT
               else
-                # Couldn't extract specific versions, test all on ubuntu only
+                # Version array format changed but couldn't parse specific versions - test all on ubuntu only
                 echo "typst-version-matrix=$ALL_VERSIONS" >> $GITHUB_OUTPUT
                 echo 'os-matrix=["ubuntu-latest"]' >> $GITHUB_OUTPUT
               fi
             else
-              # Workflow changed but no version lines changed, test all versions on ubuntu only
+              # Workflow changed but version array unchanged - test all versions on ubuntu only
               echo "typst-version-matrix=$ALL_VERSIONS" >> $GITHUB_OUTPUT
               echo 'os-matrix=["ubuntu-latest"]' >> $GITHUB_OUTPUT
             fi
