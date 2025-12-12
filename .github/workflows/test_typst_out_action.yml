@@ -19,12 +19,14 @@ jobs:
       pull-requests: read
     outputs:
       workflow-changed: ${{ steps.filter.outputs.workflow }}
-      # When workflow changes (version updates): test all OS platforms
-      # When workflow unchanged (regular commits): test only ubuntu-latest
+      # Dynamically set matrix based on which typst versions changed
+      typst-version-matrix: ${{ steps.set-matrix.outputs.typst-version-matrix }}
       os-matrix: ${{ steps.set-matrix.outputs.os-matrix }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Check for workflow changes
         uses: dorny/paths-filter@v3
@@ -34,12 +36,58 @@ jobs:
             workflow:
               - '.github/workflows/test_typst_out_action.yml'
 
-      - name: Set OS matrix
+      - name: Detect changed typst versions
         id: set-matrix
         run: |
           if [ "${{ steps.filter.outputs.workflow }}" == "true" ]; then
-            echo 'os-matrix=["ubuntu-latest", "macos-latest", "windows-latest"]' >> $GITHUB_OUTPUT
+            # Check if this is a PR or push event
+            if [ "${{ github.event_name }}" == "pull_request" ]; then
+              BASE_REF="${{ github.event.pull_request.base.sha }}"
+            else
+              BASE_REF="HEAD^"
+            fi
+            
+            # Get the diff for the workflow file
+            DIFF=$(git diff $BASE_REF HEAD -- .github/workflows/test_typst_out_action.yml || echo "")
+            
+            # Check which version lines changed
+            CHANGED_LATEST=$(echo "$DIFF" | grep -E '^\+.*- latest' || echo "")
+            CHANGED_TAG=$(echo "$DIFF" | grep -E '^\+.*- v[0-9]+\.[0-9]+\.[0-9]+.*# specify a version' || echo "")
+            CHANGED_HASH=$(echo "$DIFF" | grep -E '^\+.*- [0-9a-f]{40}.*# specify a commit hash' || echo "")
+            
+            # Build version array based on what changed
+            VERSIONS=()
+            if [ -n "$CHANGED_LATEST" ]; then
+              VERSIONS+=("latest")
+            fi
+            if [ -n "$CHANGED_TAG" ]; then
+              # Extract the actual tag value
+              TAG=$(echo "$CHANGED_TAG" | sed -n 's/^+.*- \(v[0-9.]*\).*/\1/p')
+              if [ -n "$TAG" ]; then
+                VERSIONS+=("\"$TAG\"")
+              fi
+            fi
+            if [ -n "$CHANGED_HASH" ]; then
+              # Extract the actual hash value
+              HASH=$(echo "$CHANGED_HASH" | sed -n 's/^+.*- \([0-9a-f]\{40\}\).*/\1/p')
+              if [ -n "$HASH" ]; then
+                VERSIONS+=("\"$HASH\"")
+              fi
+            fi
+            
+            # If specific versions changed, test only those on all platforms
+            if [ ${#VERSIONS[@]} -gt 0 ]; then
+              VERSION_JSON=$(IFS=,; echo "[${VERSIONS[*]}]")
+              echo "typst-version-matrix=$VERSION_JSON" >> $GITHUB_OUTPUT
+              echo 'os-matrix=["ubuntu-latest", "macos-latest", "windows-latest"]' >> $GITHUB_OUTPUT
+            else
+              # Workflow changed but no version lines changed, test all versions on ubuntu only
+              echo 'typst-version-matrix=["latest", "v0.14.1", "1472adb8bb0fa025c89464b274a96b8aeccc5780"]' >> $GITHUB_OUTPUT
+              echo 'os-matrix=["ubuntu-latest"]' >> $GITHUB_OUTPUT
+            fi
           else
+            # No workflow changes, minimal testing
+            echo 'typst-version-matrix=["latest"]' >> $GITHUB_OUTPUT
             echo 'os-matrix=["ubuntu-latest"]' >> $GITHUB_OUTPUT
           fi
 
@@ -47,10 +95,7 @@ jobs:
     needs: detect-changes
     strategy:
       matrix:
-        typst_version:
-          - latest
-          - v0.14.1 # specify a version
-          - 1472adb8bb0fa025c89464b274a96b8aeccc5780 # specify a commit hash
+        typst_version: ${{ fromJSON(needs.detect-changes.outputs.typst-version-matrix) }}
         os: ${{ fromJSON(needs.detect-changes.outputs.os-matrix) }}
       fail-fast: false
     runs-on: ${{ matrix.os }}
