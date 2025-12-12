@@ -84,7 +84,7 @@ jobs:
             fi
           else
             # No workflow changes, minimal testing (just first version)
-            FIRST_VERSION=$(echo "$ALL_VERSIONS" | jq -r '.[0]')
+            FIRST_VERSION=$(echo "$ALL_VERSIONS" | jq -r '.[0]' 2>/dev/null || echo "latest")
             echo "typst-version-matrix=[\"$FIRST_VERSION\"]" >> $GITHUB_OUTPUT
             echo 'os-matrix=["ubuntu-latest"]' >> $GITHUB_OUTPUT
           fi
