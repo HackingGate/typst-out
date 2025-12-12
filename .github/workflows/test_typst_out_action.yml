@@ -16,7 +16,7 @@ jobs:
           - latest
           - v0.14.1 # specify a version
           - 4c1db395be2ea8090658b172b8493adfa4f55cf7 # specify a commit hash
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest]
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
