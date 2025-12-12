@@ -103,35 +103,23 @@ runs:
       if: steps.typst_cache_build.outputs.cache-hit != 'true'
       uses: Swatinem/rust-cache@v2
 
-    - name: Checkout Typst
-      if: steps.typst_cache_build.outputs.cache-hit != 'true' || steps.typst_cache_fonts.outputs.cache-hit != 'true'
-      uses: actions/checkout@v6
-      with:
-        repository: typst/typst
-        path: typst
-        ref: ${{ steps.check_version.outputs.typst_ref }}
-
     - name: Install Typst
       if: steps.typst_cache_build.outputs.cache-hit != 'true'
       shell: bash
       run: |
-        cd typst
-        cargo build -p typst-cli --release
-        cd ..
-        if [ -f typst/target/release/typst ]; then
-          mkdir -p ~/typst_build
-          cp typst/target/release/typst ~/typst_build/typst
-          echo "Typst build succeeded"
+        mkdir -p ~/typst_build
+        # Install typst-cli from git using cargo
+        # Use --git with --rev to specify the exact commit hash
+        cargo install --git https://github.com/typst/typst.git --rev ${{ steps.check_version.outputs.typst_ref }} typst-cli --root ~/typst_build
+        
+        if [ -f ~/typst_build/bin/typst ]; then
+          # Move the binary to the expected location
+          mv ~/typst_build/bin/typst ~/typst_build/typst
+          echo "Typst installation succeeded"
         else
-          echo "Typst build failed"
+          echo "Typst installation failed"
           exit 1
         fi
-
-    - name: Delete Typst Source
-      if: steps.typst_cache_build.outputs.cache-hit != 'true' || steps.typst_cache_fonts.outputs.cache-hit != 'true'
-      shell: bash
-      run: |
-        rm -rf typst
 
     - name: Compile Typst files
       shell: bash

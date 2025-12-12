@@ -57,9 +57,9 @@ jobs:
 This GitHub action employs caching to speedily store and recover build artifacts and dependencies, thereby reducing build times:
 
 1. **Cache Typst build**:  
-   Caches the built Typst binary using `actions/cache@v4`. The cache key depends on the Typst commit hash (determined by the input `typst_version`). If a cache hit is found, the Rust setup and Typst build steps are skipped, saving time.
+   Caches the installed Typst binary using `actions/cache@v4`. The cache key depends on the Typst commit hash (determined by the input `typst_version`). If a cache hit is found, the Rust setup and Typst installation steps are skipped, saving time.
 
 2. **Cache Rust**:  
-   If there is a cache miss for the Typst build, the action uses `Swatinem/rust-cache@v2` to cache Rust dependencies. This reduces setup time for Rust and subsequent Typst compilation steps.
+   If there is a cache miss for the Typst build, the action uses `Swatinem/rust-cache@v2` to cache Rust dependencies. This reduces setup time for Rust and subsequent Typst installation steps.
 
 With the caching mechanism in place, the action runs faster on subsequent workflows that use the same Typst commit or version references.
