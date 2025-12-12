@@ -86,38 +86,25 @@ runs:
         echo "Using Typst ref: $typst_ref"
         echo "typst_ref=$typst_ref" >> $GITHUB_OUTPUT
 
-    - name: Cache Typst build
-      uses: actions/cache@v4
-      id: typst_cache_build
-      with:
-        path: ~/typst_build
-        key: typst-build-${{ steps.check_version.outputs.typst_ref }}-${{ runner.os }}
-
     - name: Setup Rust
-      if: steps.typst_cache_build.outputs.cache-hit != 'true'
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
+      uses: dtolnay/rust-toolchain@stable
 
     - name: Cache Rust
-      if: steps.typst_cache_build.outputs.cache-hit != 'true'
       uses: Swatinem/rust-cache@v2
 
+    - name: Cache Typst
+      uses: actions/cache@v4
+      id: typst_cache
+      with:
+        path: ~/.cargo/bin/typst
+        key: typst-${{ steps.check_version.outputs.typst_ref }}-${{ runner.os }}
+
     - name: Install Typst
-      if: steps.typst_cache_build.outputs.cache-hit != 'true'
+      if: steps.typst_cache.outputs.cache-hit != 'true'
       shell: bash
       run: |
         # Install typst-cli from git using cargo
-        # Use --git with --rev to specify the exact commit hash
-        # The binary will be installed to ~/typst_build/bin/typst
-        cargo install --git https://github.com/typst/typst.git --rev ${{ steps.check_version.outputs.typst_ref }} typst-cli --root ~/typst_build
-
-        if [ -f ~/typst_build/bin/typst ]; then
-          echo "Typst installation succeeded"
-        else
-          echo "Typst installation failed"
-          exit 1
-        fi
+        cargo install --git https://github.com/typst/typst.git --rev ${{ steps.check_version.outputs.typst_ref }} typst-cli
 
     - name: Compile Typst files
       shell: bash
@@ -129,7 +116,7 @@ runs:
         echo "Output extension: $outputextension"
         find . -name "*.typ" -not -name "template.typ" | while read -r file; do
           echo "Compiling $file to ${file%.typ}.${outputextension}"
-          ~/typst_build/bin/typst compile "$file" "${file%.typ}.${outputextension}"
+          typst compile "$file" "${file%.typ}.${outputextension}"
         done
         echo "Compiled Typst files"
         echo "Output files:"
