@@ -62,7 +62,7 @@ jobs:
             fi
             if [ -n "$CHANGED_TAG" ]; then
               # Extract the actual tag value
-              TAG=$(echo "$CHANGED_TAG" | sed -n 's/^+.*- \(v[0-9.]*\).*/\1/p')
+              TAG=$(echo "$CHANGED_TAG" | sed -n 's/^+.*- \(v[0-9]\+\.[0-9]\+\.[0-9]\+\).*/\1/p')
               if [ -n "$TAG" ]; then
                 VERSIONS+=("\"$TAG\"")
               fi
