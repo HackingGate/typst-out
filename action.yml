@@ -111,7 +111,7 @@ runs:
         # Install typst-cli from git using cargo
         # Use --git with --rev to specify the exact commit hash
         cargo install --git https://github.com/typst/typst.git --rev ${{ steps.check_version.outputs.typst_ref }} typst-cli --root ~/typst_build
-        
+
         if [ -f ~/typst_build/bin/typst ]; then
           # Move the binary to the expected location
           mv ~/typst_build/bin/typst ~/typst_build/typst
