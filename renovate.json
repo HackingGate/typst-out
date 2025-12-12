@@ -15,9 +15,7 @@
     {
       "customType": "regex",
       "fileMatch": ["^\\.github/workflows/test_typst_out_action\\.yml$"],
-      "matchStrings": [
-        "TYPST_VERSION_TAG: (?<currentValue>.*?) # specify a version"
-      ],
+      "matchStrings": ["\"(?<currentValue>v[0-9]+\\.[0-9]+\\.[0-9]+)\""],
       "datasourceTemplate": "github-releases",
       "versioningTemplate": "loose",
       "depNameTemplate": "typst/typst"
@@ -25,9 +23,7 @@
     {
       "customType": "regex",
       "fileMatch": ["^\\.github/workflows/test_typst_out_action\\.yml$"],
-      "matchStrings": [
-        "TYPST_VERSION_HASH: (?<currentDigest>.*?) # specify a commit hash"
-      ],
+      "matchStrings": ["\"(?<currentDigest>[0-9a-f]{40})\""],
       "depNameTemplate": "typst/typst",
       "packageNameTemplate": "https://github.com/typst/typst.git",
       "datasourceTemplate": "git-refs",
