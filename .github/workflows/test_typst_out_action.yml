@@ -19,6 +19,9 @@ jobs:
       pull-requests: read
     outputs:
       workflow-changed: ${{ steps.filter.outputs.workflow }}
+      # When workflow changes (version updates): test all OS platforms
+      # When workflow unchanged (regular commits): test only ubuntu-latest
+      os-matrix: ${{ steps.set-matrix.outputs.os-matrix }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -31,6 +34,15 @@ jobs:
             workflow:
               - '.github/workflows/test_typst_out_action.yml'
 
+      - name: Set OS matrix
+        id: set-matrix
+        run: |
+          if [ "${{ steps.filter.outputs.workflow }}" == "true" ]; then
+            echo 'os-matrix=["ubuntu-latest", "macos-latest", "windows-latest"]' >> $GITHUB_OUTPUT
+          else
+            echo 'os-matrix=["ubuntu-latest"]' >> $GITHUB_OUTPUT
+          fi
+
   test_typst_out_action:
     needs: detect-changes
     strategy:
@@ -39,7 +51,7 @@ jobs:
           - latest
           - v0.14.1 # specify a version
           - 1472adb8bb0fa025c89464b274a96b8aeccc5780 # specify a commit hash
-        os: ${{ needs.detect-changes.outputs.workflow-changed == 'true' && fromJSON('["ubuntu-latest", "macos-latest", "windows-latest"]') || fromJSON('["ubuntu-latest"]') }}
+        os: ${{ fromJSON(needs.detect-changes.outputs.os-matrix) }}
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
