@@ -107,14 +107,12 @@ runs:
       if: steps.typst_cache_build.outputs.cache-hit != 'true'
       shell: bash
       run: |
-        mkdir -p ~/typst_build
         # Install typst-cli from git using cargo
         # Use --git with --rev to specify the exact commit hash
+        # The binary will be installed to ~/typst_build/bin/typst
         cargo install --git https://github.com/typst/typst.git --rev ${{ steps.check_version.outputs.typst_ref }} typst-cli --root ~/typst_build
 
         if [ -f ~/typst_build/bin/typst ]; then
-          # Move the binary to the expected location
-          mv ~/typst_build/bin/typst ~/typst_build/typst
           echo "Typst installation succeeded"
         else
           echo "Typst installation failed"
@@ -131,7 +129,7 @@ runs:
         echo "Output extension: $outputextension"
         find . -name "*.typ" -not -name "template.typ" | while read -r file; do
           echo "Compiling $file to ${file%.typ}.${outputextension}"
-          ~/typst_build/typst compile "$file" "${file%.typ}.${outputextension}"
+          ~/typst_build/bin/typst compile "$file" "${file%.typ}.${outputextension}"
         done
         echo "Compiled Typst files"
         echo "Output files:"
