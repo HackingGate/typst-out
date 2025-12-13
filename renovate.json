@@ -1,16 +1,16 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
+  "extends": [
+    "config:recommended"
+  ],
+  "schedule": [
+    "before 6am on Monday"
+  ],
   "git-submodules": {
     "enabled": true
   },
   "automerge": true,
   "timezone": "Asia/Tokyo",
-  "automergeSchedule": [
-    "after 10pm every weekday",
-    "before 5am every weekday",
-    "every weekend"
-  ],
   "customManagers": [
     {
       "customType": "regex",
