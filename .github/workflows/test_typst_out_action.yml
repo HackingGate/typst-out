@@ -8,15 +8,121 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
+env:
+  # Array of typst versions to test
+  # Renovate will update these values
+  TYPST_VERSIONS: |
+    [
+      "latest",
+      "v0.14.1",
+      "839c6f76f331dd2f30ede9affa9d734f88828d83"
+    ]
+
 jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      workflow-changed: ${{ steps.filter.outputs.workflow }}
+      # Dynamically set matrix based on which typst versions changed
+      typst-version-matrix: ${{ steps.set-matrix.outputs.typst-version-matrix }}
+      os-matrix: ${{ steps.set-matrix.outputs.os-matrix }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Check for workflow changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            workflow:
+              - '.github/workflows/test_typst_out_action.yml'
+
+      - name: Detect changed typst versions
+        id: set-matrix
+        run: |
+          # Parse the TYPST_VERSIONS array
+          ALL_VERSIONS='${{ env.TYPST_VERSIONS }}'
+
+          if [ "${{ steps.filter.outputs.workflow }}" == "true" ]; then
+            # Check if this is a PR or push event
+            if [ "${{ github.event_name }}" == "pull_request" ]; then
+              BASE_REF="${{ github.event.pull_request.base.sha }}"
+            else
+              BASE_REF="HEAD^"
+            fi
+            
+            # Get the diff for the workflow file
+            DIFF=$(git diff $BASE_REF HEAD -- .github/workflows/test_typst_out_action.yml || echo "")
+            
+            # Extract versions from diff - only ADDED lines (new versions)
+            # Match only lines that are array elements (contain whitespace, quote, value, quote, optional comma)
+            ADDED_VERSIONS=$(echo "$DIFF" | grep -E '^\+\s+"(latest|v[0-9]+\.[0-9]+\.[0-9]+|[0-9a-f]{40})"' || echo "")
+            REMOVED_VERSIONS=$(echo "$DIFF" | grep -E '^-\s+"(latest|v[0-9]+\.[0-9]+\.[0-9]+|[0-9a-f]{40})"' || echo "")
+            
+            if [ -n "$ADDED_VERSIONS" ]; then
+              # Extract added versions - only capture the actual version string between quotes
+              NEW_VERSIONS=$(echo "$ADDED_VERSIONS" | sed -n 's/^+\s*"\([^"]*\)".*/\1/p')
+              
+              # Extract removed versions to filter out
+              OLD_VERSIONS=$(echo "$REMOVED_VERSIONS" | sed -n 's/^-\s*"\([^"]*\)".*/\1/p')
+              
+              # Filter out versions that were already present (not truly new)
+              TRULY_NEW_VERSIONS=""
+              for version in $NEW_VERSIONS; do
+                # version is already without quotes from sed
+                is_old=false
+                for old in $OLD_VERSIONS; do
+                  if [ "$version" = "$old" ]; then
+                    is_old=true
+                    break
+                  fi
+                done
+                if [ "$is_old" = false ]; then
+                  if [ -z "$TRULY_NEW_VERSIONS" ]; then
+                    TRULY_NEW_VERSIONS="\"$version\""
+                  else
+                    TRULY_NEW_VERSIONS="$TRULY_NEW_VERSIONS,\"$version\""
+                  fi
+                fi
+              done
+              
+              if [ -n "$TRULY_NEW_VERSIONS" ]; then
+                # New versions detected - test only those on all platforms
+                echo "typst-version-matrix=[$TRULY_NEW_VERSIONS]" >> $GITHUB_OUTPUT
+                echo 'os-matrix=["ubuntu-latest", "macos-latest", "windows-latest"]' >> $GITHUB_OUTPUT
+              else
+                # Parsing failed - fail the job
+                echo "::error::Failed to parse new versions from diff. Please check TYPST_VERSIONS format."
+                exit 1
+              fi
+            else
+              # Workflow changed but version array unchanged - test latest only on ubuntu-latest
+              FIRST_VERSION=$(echo "$ALL_VERSIONS" | jq -r '.[0]' 2>/dev/null || echo "latest")
+              echo "typst-version-matrix=[\"$FIRST_VERSION\"]" >> $GITHUB_OUTPUT
+              echo 'os-matrix=["ubuntu-latest"]' >> $GITHUB_OUTPUT
+            fi
+          else
+            # No workflow changes, minimal testing (just first version)
+            FIRST_VERSION=$(echo "$ALL_VERSIONS" | jq -r '.[0]' 2>/dev/null || echo "latest")
+            echo "typst-version-matrix=[\"$FIRST_VERSION\"]" >> $GITHUB_OUTPUT
+            echo 'os-matrix=["ubuntu-latest"]' >> $GITHUB_OUTPUT
+          fi
+
   test_typst_out_action:
+    needs: detect-changes
     strategy:
       matrix:
-        typst_version:
-          - latest
-          - v0.14.2 # specify a version
-          - 839c6f76f331dd2f30ede9affa9d734f88828d83 # specify a commit hash
-        os: [ubuntu-latest]
+        typst_version: ${{ fromJSON(needs.detect-changes.outputs.typst-version-matrix) }}
+        os: ${{ fromJSON(needs.detect-changes.outputs.os-matrix) }}
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
