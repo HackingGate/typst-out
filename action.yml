@@ -93,7 +93,7 @@ runs:
       uses: Swatinem/rust-cache@v2
 
     - name: Cache Typst
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       id: typst_cache
       with:
         path: ~/.cargo/bin/typst
@@ -123,7 +123,7 @@ runs:
         find . -name "*.$outputextension"
 
     - name: Upload ouputs as artifacts
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: ${{ inputs.artifacts_name }}
         path: |
