@@ -35,7 +35,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Compile Typst files
-        uses: HackingGate/typst-out@v3.0.0
+        uses: HackingGate/typst-out@v3.1.0
         with:
           typst_version: latest
           retention_days: 7
