@@ -18,7 +18,7 @@ env:
     [
       "latest",
       "v0.14.1",
-      "839c6f76f331dd2f30ede9affa9d734f88828d83"
+      "a87f4b15ca86a0b2f98948d8f393608070ed731e"
     ]
 
 jobs:
