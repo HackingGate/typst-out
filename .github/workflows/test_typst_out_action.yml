@@ -17,7 +17,7 @@ env:
   TYPST_VERSIONS: |
     [
       "latest",
-      "v0.14.1",
+      "v0.14.2",
       "a87f4b15ca86a0b2f98948d8f393608070ed731e"
     ]
 
