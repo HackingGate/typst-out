@@ -83,8 +83,8 @@ jobs:
             if [ -n "${{ github.event.inputs.typst_version }}" ]; then
               echo 'typst-version-matrix=["${{ github.event.inputs.typst_version }}"]' >> $GITHUB_OUTPUT
             else
-              # Use all versions from TYPST_VERSIONS
-              echo "typst-version-matrix=$ALL_VERSIONS" >> $GITHUB_OUTPUT
+              # Use all versions from TYPST_VERSIONS (compact JSON to single line)
+              echo "typst-version-matrix=$(echo "$ALL_VERSIONS" | jq -c '.')" >> $GITHUB_OUTPUT
             fi
             
             exit 0
