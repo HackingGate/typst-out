@@ -73,7 +73,7 @@ jobs:
             echo "Manual workflow dispatch detected"
             
             # Handle OS selection
-            if [ "${{ github.event.inputs.os }}" == "all" ] || [ -z "${{ github.event.inputs.os }}" ]; then
+            if [ "${{ github.event.inputs.os }}" == "all" ]; then
               echo 'os-matrix=["ubuntu-latest", "macos-latest", "windows-latest"]' >> $GITHUB_OUTPUT
             else
               echo 'os-matrix=["${{ github.event.inputs.os }}"]' >> $GITHUB_OUTPUT
