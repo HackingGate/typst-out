@@ -142,8 +142,8 @@ jobs:
             fonts-texgyre \
             fonts-cascadia-code
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            # Install Not Sans CJK fonts
-            brew install --cask font-noto-sans-cjk
+            # Install Noto Sans CJK fonts (individual language-specific packages)
+            brew install --cask font-noto-sans-cjk-tc font-noto-sans-cjk-jp font-noto-sans-cjk-kr
             # Install other fonts may be used in the template
             echo "Installing TeX Gyre fonts..."
             brew search font-tex-gyre | grep '^font-tex-gyre' | xargs -I{} brew install --cask {}
