@@ -239,7 +239,7 @@ jobs:
         uses: ./
         with:
           typst_version: ${{ matrix.typst_version }}
-          retention_days: 7
+          retention_days: 30
           artifacts_name: typst_output_${{ matrix.typst_version }}_${{ matrix.os }}
           output_extensions: pdf
           template_file: template.typ
